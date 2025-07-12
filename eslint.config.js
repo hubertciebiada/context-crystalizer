@@ -98,7 +98,10 @@ export default [
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
-      'no-console': 'off'
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-namespace': 'off',
+      'no-console': 'off',
+      'no-unused-vars': 'off'
     }
   },
   {
