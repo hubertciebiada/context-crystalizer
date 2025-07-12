@@ -49,7 +49,7 @@ export class ContextSearch {
       results.sort((a, b) => b.relevanceScore - a.relevanceScore);
       
       return this.filterByTokenLimit(results, maxTokens);
-    } catch (error) {
+    } catch (_error) {
       console.error('Error searching contexts:', error);
       return [];
     }
@@ -130,7 +130,7 @@ export class ContextSearch {
       }
       
       return results.slice(0, maxResults);
-    } catch (error) {
+    } catch (_error) {
       console.error('Error searching by complexity:', error);
       return [];
     }
@@ -302,13 +302,13 @@ export class ContextSearch {
 
   async loadContext(relativePath: string): Promise<CrystallizedContext | null> {
     try {
-      const contextPath = path.join(this.contextBasePath, 'context', relativePath + '.context.md');
+      const contextPath = path.join(this.contextBasePath, 'context', `${relativePath  }.context.md`);
       const markdown = await fs.readFile(contextPath, 'utf-8');
       
       // Simple parser - extract key information
       const context = this.parseContextFromMarkdown(markdown, relativePath);
       return context;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

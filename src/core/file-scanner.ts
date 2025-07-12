@@ -94,7 +94,7 @@ export class FileScanner {
     try {
       const gitignoreContent = await fs.readFile(gitignorePath, 'utf-8');
       this.ig.add(gitignoreContent);
-    } catch (error) {
+    } catch (_error) {
       // .gitignore might not exist
     }
 
@@ -171,7 +171,7 @@ export class FileScanner {
     const fileName = path.basename(filePath);
     
     // Determine file type and base configuration
-    let config = this.getFileTypeConfig(filePath, ext);
+    const config = this.getFileTypeConfig(filePath, ext);
     let priority = config.priority;
     
     // Special priority adjustments

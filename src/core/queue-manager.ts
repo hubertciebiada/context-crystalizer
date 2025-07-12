@@ -148,7 +148,7 @@ export class QueueManager {
       console.error(`Recovered session ${this.sessionId} with ${this.processed.size} processed files and ${this.queue.length} remaining.`);
       
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false; // No valid session to recover
     }
   }
@@ -170,7 +170,7 @@ export class QueueManager {
     try {
       await fs.mkdir(path.dirname(this.queueStatePath), { recursive: true });
       await fs.writeFile(this.queueStatePath, JSON.stringify(state, null, 2), 'utf-8');
-    } catch (error) {
+    } catch (_error) {
       console.error('Failed to save queue state:', error);
     }
   }
@@ -187,7 +187,7 @@ export class QueueManager {
     
     try {
       await fs.unlink(this.queueStatePath);
-    } catch (error) {
+    } catch (_error) {
       // File might not exist
     }
   }

@@ -46,12 +46,12 @@ export class TokenCounter {
     const lastNewline = truncated.lastIndexOf('\n');
     
     if (lastSentence > maxChars * 0.8) {
-      return truncated.substring(0, lastSentence + 1) + '...';
+      return `${truncated.substring(0, lastSentence + 1)  }...`;
     } else if (lastNewline > maxChars * 0.8) {
-      return truncated.substring(0, lastNewline) + '\n...';
+      return `${truncated.substring(0, lastNewline)  }\n...`;
     } else {
       const lastSpace = truncated.lastIndexOf(' ');
-      return truncated.substring(0, lastSpace > maxChars * 0.8 ? lastSpace : maxChars) + '...';
+      return `${truncated.substring(0, lastSpace > maxChars * 0.8 ? lastSpace : maxChars)  }...`;
     }
   }
   

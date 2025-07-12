@@ -12,7 +12,15 @@
       "Bash(npm test:*)",
       "Bash(rm:*)",
       "Bash(npm run clean:*)",
-      "Bash(npm pack:*)"
+      "Bash(npm pack:*)",
+      "mcp__github__get_pull_request_status",
+      "mcp__github__list_commits",
+      "WebFetch(domain:github.com)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

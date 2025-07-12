@@ -64,7 +64,7 @@ export class AITestMetricsCollector {
     let totalAccuracy = 0;
     let totalConsistency = 0;
     let totalCrossRefAccuracy = 0;
-    let totalGenerationTime = 0;
+    const totalGenerationTime = 0;
 
     for (const context of contexts) {
       // Validate context quality
@@ -94,7 +94,7 @@ export class AITestMetricsCollector {
     let totalPrecision5 = 0;
     let totalPrecision10 = 0;
     let totalRelevance = 0;
-    let totalResponseTime = 0;
+    const totalResponseTime = 0;
     let falsePositives = 0;
     let totalResults = 0;
 
@@ -173,7 +173,7 @@ export class AITestMetricsCollector {
       try {
         const validation = await this.contextValidator.validateContext(context);
         validations.push(validation);
-      } catch (error) {
+      } catch (_error) {
         errors++;
       }
     }

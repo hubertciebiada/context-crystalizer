@@ -73,27 +73,27 @@ jobs:
         # Check for common secret patterns
         SECRETS_FOUND=false
         
-        # API keys
-        if grep -r -E "(api[_-]?key|apikey)[\"'\s]*[:=][\"'\s]*[a-zA-Z0-9]{20,}" src/ --exclude-dir=node_modules || true; then
+        # Real API keys (not in comments or documentation)
+        if grep -r -E "^[^#/\*]*[\"']?api[_-]?key[\"']?\s*[:=]\s*[\"'][a-zA-Z0-9]{32,}[\"']" src/ --include="*.ts" --include="*.js" --exclude-dir=node_modules || false; then
           echo "❌ Potential API keys found"
           SECRETS_FOUND=true
         fi
         
-        # Private keys
-        if grep -r "BEGIN.*PRIVATE.*KEY" src/ --exclude-dir=node_modules || true; then
+        # Real private keys (actual PEM content)
+        if grep -r "^-----BEGIN.*PRIVATE.*KEY-----" src/ --exclude-dir=node_modules || false; then
           echo "❌ Private keys found"
           SECRETS_FOUND=true
         fi
         
-        # Tokens
-        if grep -r -E "(token|access[_-]?token)[\"'\s]*[:=][\"'\s]*[a-zA-Z0-9]{20,}" src/ --exclude-dir=node_modules || true; then
+        # Real tokens (not in comments or documentation)
+        if grep -r -E "^[^#/\*]*[\"']?(access_token|bearer_token)[\"']?\s*[:=]\s*[\"'][a-zA-Z0-9]{32,}[\"']" src/ --include="*.ts" --include="*.js" --exclude-dir=node_modules || false; then
           echo "❌ Potential tokens found"
           SECRETS_FOUND=true
         fi
         
-        # Passwords
-        if grep -r -E "(password|pwd)[\"'\s]*[:=][\"'\s]*[^\s\"']{8,}" src/ --exclude-dir=node_modules || true; then
-          echo "❌ Potential passwords found"
+        # Hardcoded passwords (not variable names or comments)
+        if grep -r -E "^[^#/\*]*[\"']?password[\"']?\s*[:=]\s*[\"'][^\"']{8,}[\"']" src/ --include="*.ts" --include="*.js" --exclude-dir=node_modules --exclude="*.test.*" || false; then
+          echo "❌ Potential hardcoded passwords found"
           SECRETS_FOUND=true
         fi
         

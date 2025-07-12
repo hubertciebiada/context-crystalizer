@@ -93,7 +93,7 @@ export class ContextStorage {
     try {
       const content = await fs.readFile(contextPath, 'utf-8');
       return this.parseMarkdownContext(content, relativePath);
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }
@@ -118,7 +118,7 @@ export class ContextStorage {
 
   private getContextPath(relativePath: string): string {
     // Create a directory structure that mirrors the source
-    const contextRelativePath = relativePath + '.context.md';
+    const contextRelativePath = `${relativePath  }.context.md`;
     return path.join(this.contextBasePath, 'context', contextRelativePath);
   }
 
@@ -280,7 +280,7 @@ export class ContextStorage {
       lines.push(`*Generated: ${new Date().toISOString()}*`);
       
       await fs.writeFile(indexPath, lines.join('\n'), 'utf-8');
-    } catch (error) {
+    } catch (_error) {
       console.warn('Failed to regenerate index:', error);
     }
   }
@@ -322,7 +322,7 @@ export class ContextStorage {
         totalTokens,
         avgTokensPerContext: contexts.length > 0 ? totalTokens / contexts.length : 0,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         totalContexts: 0,
         byCategory: {},

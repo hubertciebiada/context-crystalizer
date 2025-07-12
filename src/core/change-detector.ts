@@ -154,7 +154,7 @@ export class ChangeDetector {
         const contextPath = path.join(
           this.contextBasePath,
           'context',
-          change.relativePath + '.context.md'
+          `${change.relativePath  }.context.md`
         );
         
         try {
@@ -177,7 +177,7 @@ export class ChangeDetector {
       const contextPath = path.join(
         this.contextBasePath,
         'context',
-        relativePath + '.context.md'
+        `${relativePath  }.context.md`
       );
       
       try {
@@ -191,7 +191,7 @@ export class ChangeDetector {
       const metadataPath = path.join(
         this.contextBasePath,
         'ai-metadata',
-        relativePath.replace(/\//g, '_') + '.json'
+        `${relativePath.replace(/\//g, '_')  }.json`
       );
       
       try {
@@ -241,7 +241,7 @@ export class ChangeDetector {
       const hash = crypto.createHash('sha256');
       hash.update(content);
       return hash.digest('hex');
-    } catch (error) {
+    } catch (_error) {
       // If file can't be read, return empty hash
       return '';
     }
@@ -251,7 +251,7 @@ export class ChangeDetector {
     const contextPath = path.join(
       this.contextBasePath,
       'context',
-      relativePath + '.context.md'
+      `${relativePath  }.context.md`
     );
     
     try {

@@ -6,7 +6,7 @@ import { AITestMetricsCollector, AITestMetrics } from '../utils/ai-test-metrics.
 
 describe('End-to-End AI Context Testing', () => {
   let tempDir: string;
-  let testResults: { 
+  const testResults: { 
     repo: string; 
     metrics: AITestMetrics; 
     report: string; 
@@ -21,7 +21,7 @@ describe('End-to-End AI Context Testing', () => {
     
     // Generate comprehensive test report
     const finalReport = generateFinalTestReport(testResults);
-    console.log('\n' + '='.repeat(80));
+    console.log(`\n${  '='.repeat(80)}`);
     console.log('AI CONTEXT QUALITY TEST REPORT');
     console.log('='.repeat(80));
     console.log(finalReport);
@@ -418,7 +418,7 @@ async function generateAdvancedAIContext(file: any, content: string, allFiles: a
   const category = determineCategory(file);
   const complexity = file.complexity;
   
-  let purpose = generatePurpose(file, content, category, complexity);
+  const purpose = generatePurpose(file, content, category, complexity);
   
   const keyAPIs = [
     ...classes.slice(0, 2),

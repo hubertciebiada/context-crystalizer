@@ -172,7 +172,7 @@ export class ContextValidator {
           crossReferenceRatio: Math.round(crossReferenceRatio * 100) / 100,
         },
       };
-    } catch (error) {
+    } catch (_error) {
       console.error('Error generating quality report:', error);
       return {
         overallScore: 0,
@@ -473,12 +473,12 @@ export class ContextValidator {
 
   private async loadContext(relativePath: string): Promise<CrystallizedContext | null> {
     try {
-      const contextPath = path.join(this.contextBasePath, 'context', relativePath + '.context.md');
+      const contextPath = path.join(this.contextBasePath, 'context', `${relativePath  }.context.md`);
       const markdown = await fs.readFile(contextPath, 'utf-8');
       
       // Use the same parser as in context-search.ts
       return this.parseContextFromMarkdown(markdown, relativePath);
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

@@ -57,7 +57,7 @@ export class UserController {
     try {
       const users = await this.userService.getAllUsers();
       res.json(users);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Failed to fetch users' });
     }
   };
@@ -66,7 +66,7 @@ export class UserController {
     try {
       const user = await this.userService.createUser(req.body);
       res.status(201).json(user);
-    } catch (error) {
+    } catch (_error) {
       res.status(400).json({ error: 'Failed to create user' });
     }
   };
@@ -78,7 +78,7 @@ export class UserController {
         return res.status(404).json({ error: 'User not found' });
       }
       res.json(user);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Failed to fetch user' });
     }
   };
@@ -87,7 +87,7 @@ export class UserController {
     try {
       const user = await this.userService.updateUser(req.params.id, req.body);
       res.json(user);
-    } catch (error) {
+    } catch (_error) {
       res.status(400).json({ error: 'Failed to update user' });
     }
   };
@@ -96,7 +96,7 @@ export class UserController {
     try {
       await this.userService.deleteUser(req.params.id);
       res.status(204).send();
-    } catch (error) {
+    } catch (_error) {
       res.status(500).json({ error: 'Failed to delete user' });
     }
   };
@@ -221,7 +221,7 @@ async function startServer() {
     app.listen(PORT, () => {
       logger.info(\`Server running on port \${PORT}\`);
     });
-  } catch (error) {
+  } catch (_error) {
     logger.error('Failed to start server:', error);
     process.exit(1);
   }
@@ -263,7 +263,7 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     };
     
     next();
-  } catch (error) {
+  } catch (_error) {
     logger.error('Authentication error:', error);
     res.status(401).json({ error: 'Invalid token.' });
   }
@@ -342,7 +342,7 @@ export class DatabaseService {
       const db = this.getInstance();
       await db.$queryRaw\`SELECT 1\`;
       return true;
-    } catch (error) {
+    } catch (_error) {
       logger.error('Database health check failed:', error);
       return false;
     }
@@ -373,7 +373,7 @@ export class CacheService {
   static async get(key: string): Promise<string | null> {
     try {
       return await this.client.get(key);
-    } catch (error) {
+    } catch (_error) {
       logger.error('Cache get error:', error);
       return null;
     }
@@ -386,7 +386,7 @@ export class CacheService {
       } else {
         await this.client.set(key, value);
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Cache set error:', error);
     }
   }
@@ -394,7 +394,7 @@ export class CacheService {
   static async del(key: string): Promise<void> {
     try {
       await this.client.del(key);
-    } catch (error) {
+    } catch (_error) {
       logger.error('Cache delete error:', error);
     }
   }
@@ -403,7 +403,7 @@ export class CacheService {
     try {
       const result = await this.client.exists(key);
       return result === 1;
-    } catch (error) {
+    } catch (_error) {
       logger.error('Cache exists error:', error);
       return false;
     }
@@ -416,7 +416,7 @@ export class CacheService {
         await this.client.del(keys);
         logger.info(\`Invalidated \${keys.length} cache entries matching pattern: \${pattern}\`);
       }
-    } catch (error) {
+    } catch (_error) {
       logger.error('Cache pattern invalidation error:', error);
     }
   }

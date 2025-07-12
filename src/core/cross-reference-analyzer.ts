@@ -316,7 +316,7 @@ export class CrossReferenceAnalyzer {
       
       // Try index files
       for (const ext of extensions) {
-        const indexFile = path.join(resolved, 'index' + ext);
+        const indexFile = path.join(resolved, `index${  ext}`);
         if (allFiles.includes(indexFile)) {
           return indexFile;
         }

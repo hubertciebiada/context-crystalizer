@@ -140,7 +140,7 @@ export class ContextUpdater {
       // Regenerate index after updates
       // Note: Index will be regenerated when contexts are actually stored
 
-    } catch (error) {
+    } catch (_error) {
       result.errors.push({
         file: 'general',
         error: error instanceof Error ? error.message : 'Unknown error',
@@ -218,7 +218,7 @@ export class ContextUpdater {
         lastModified: stats.mtime,
         contextAge,
       };
-    } catch (error) {
+    } catch (_error) {
       return {
         isFresh: false,
         reason: 'Error checking file status',
