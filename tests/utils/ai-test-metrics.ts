@@ -184,8 +184,8 @@ export class AITestMetricsCollector {
 
     // Calculate category consistency
     const categoryGroups: Record<string, number[]> = {};
-    validations.forEach(v => {
-      const category = contexts.find(c => c.relativePath === v.metrics.completeness)?.category || 'other';
+    validations.forEach((v, index) => {
+      const category = contexts[index]?.category || 'other';
       if (!categoryGroups[category]) categoryGroups[category] = [];
       categoryGroups[category].push(v.score);
     });

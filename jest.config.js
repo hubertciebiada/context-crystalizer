@@ -18,6 +18,20 @@ export default {
   transform: {
     '^.+\\.ts$': ['ts-jest', {
       useESM: true,
+      isolatedModules: true,
+      tsconfig: {
+        target: 'ES2022',
+        module: 'ES2022',
+        moduleResolution: 'node',
+        strict: false,
+        esModuleInterop: true,
+        skipLibCheck: true,
+        types: ['node', 'jest'],
+        noUnusedLocals: false,
+        noUnusedParameters: false,
+        noImplicitAny: false,
+        skipDefaultLibCheck: true,
+      },
     }],
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],

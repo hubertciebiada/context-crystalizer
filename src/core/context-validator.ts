@@ -1,29 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
-import { CrystallizedContext } from '../types/index.js';
-
-export interface ValidationResult {
-  isValid: boolean;
-  score: number; // 0-100 quality score
-  issues: ValidationIssue[];
-  suggestions: string[];
-  metrics: QualityMetrics;
-}
-
-export interface ValidationIssue {
-  severity: 'error' | 'warning' | 'info';
-  category: 'completeness' | 'accuracy' | 'usefulness' | 'format';
-  message: string;
-  field?: string;
-}
-
-export interface QualityMetrics {
-  completeness: number; // 0-100
-  specificity: number; // 0-100
-  aiReadability: number; // 0-100
-  tokenEfficiency: number; // 0-100
-  crossReferenceQuality: number; // 0-100
-}
+import { CrystallizedContext, ValidationResult, ValidationIssue, QualityMetrics } from '../types/index.js';
 
 export interface ProjectQualityReport {
   overallScore: number;

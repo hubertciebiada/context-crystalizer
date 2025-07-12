@@ -96,16 +96,8 @@ global.testUtils = {
   }
 };
 
-// Type declarations for custom matchers
+// Type declarations are in tests/types.d.ts
 declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toBeValidContext(): R;
-      toHaveTokenEfficiency(min: number, max: number): R;
-      toHaveQualityScore(minScore: number): R;
-    }
-  }
-  
   var testUtils: {
     createTempDir(): Promise<string>;
     cleanup(dirPath: string): Promise<void>;

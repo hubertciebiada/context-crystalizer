@@ -83,6 +83,8 @@ export class QueueManager {
       processedByCategory[category] = 0;
     });
     
+    const completionPercentage = totalFiles > 0 ? Math.round((processedFiles / totalFiles) * 100) : 0;
+    
     const progress: CrystallizationProgress = {
       totalFiles,
       processedFiles,
@@ -94,6 +96,7 @@ export class QueueManager {
       avgTokensPerFile,
       filesByCategory,
       processedByCategory,
+      completionPercentage,
     };
     
     if (processedFiles > 0 && this.startTime) {

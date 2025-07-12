@@ -60,6 +60,7 @@ export interface CrystallizationProgress {
   avgTokensPerFile: number;
   filesByCategory: Record<string, number>;
   processedByCategory: Record<string, number>;
+  completionPercentage: number;
 }
 
 export interface SearchResult {
@@ -83,4 +84,27 @@ export interface QueueState {
   startTime: Date;
   lastActivity: Date;
   excludePatterns: string[];
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  score: number;
+  issues: ValidationIssue[];
+  suggestions: string[];
+  metrics: QualityMetrics;
+}
+
+export interface ValidationIssue {
+  severity: 'error' | 'warning' | 'info';
+  category: 'completeness' | 'accuracy' | 'usefulness' | 'format';
+  message: string;
+  field?: string;
+}
+
+export interface QualityMetrics {
+  completeness: number;
+  specificity: number;
+  aiReadability: number;
+  tokenEfficiency: number;
+  crossReferenceQuality: number;
 }

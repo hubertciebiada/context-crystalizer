@@ -423,15 +423,12 @@ async function generateMockAIContext(file: any, content: string): Promise<any> {
   );
   
   const classMatches = content.match(/class\s+(\w+)/g) || [];
-  const functionMatches = content.match(/(?:function\s+(\w+)|(\w+)\s*\([^)]*\)\s*{|(\w+)\s*=\s*\([^)]*\)\s*=>)/g) || [];
+  const functionMatches = content.match(/function\s+(\w+)/g) || [];
   const exportMatches = content.match(/export\s+(?:default\s+)?(?:class|function|const|let|var)\s+(\w+)/g) || [];
 
   const keyAPIs = [
     ...classMatches.map(m => m.replace('class ', '')),
-    ...functionMatches.slice(0, 3).map(m => {
-      const match = m.match(/(?:function\s+(\w+)|(\w+)\s*\(|(\w+)\s*=/);
-      return match ? (match[1] || match[2] || match[3]) : 'function';
-    }),
+    ...functionMatches.slice(0, 3).map(m => m.replace('function ', '')),
     ...exportMatches.slice(0, 2).map(m => {
       const match = m.match(/export\s+(?:default\s+)?(?:class|function|const|let|var)\s+(\w+)/);
       return match ? match[1] : 'export';
