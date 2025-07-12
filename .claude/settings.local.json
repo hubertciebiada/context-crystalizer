@@ -28,7 +28,8 @@
       "Bash(npm search:*)",
       "mcp__github__list_tags",
       "Bash(gh release create:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

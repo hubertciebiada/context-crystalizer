@@ -53,7 +53,6 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
-    "context-crystallizer": "file:context-crystallizer-1.0.0.tgz",
     "glob": "^11.0.0",
     "ignore": "^6.0.2",
     "minimatch": "^10.0.1",
