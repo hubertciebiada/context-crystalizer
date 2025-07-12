@@ -281,7 +281,7 @@ export class ContextStorage {
       
       await fs.writeFile(indexPath, lines.join('\n'), 'utf-8');
     } catch (_error) {
-      console.warn('Failed to regenerate index:', error);
+      console.warn('Failed to regenerate index:', _error);
     }
   }
 

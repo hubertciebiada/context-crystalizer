@@ -143,7 +143,7 @@ export class ContextUpdater {
     } catch (_error) {
       result.errors.push({
         file: 'general',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: _error instanceof Error ? _error.message : 'Unknown error',
       });
       result.summary.errors++;
     }

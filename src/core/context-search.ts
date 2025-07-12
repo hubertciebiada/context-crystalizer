@@ -50,7 +50,7 @@ export class ContextSearch {
       
       return this.filterByTokenLimit(results, maxTokens);
     } catch (_error) {
-      console.error('Error searching contexts:', error);
+      console.error('Error searching contexts:', _error);
       return [];
     }
   }
@@ -131,7 +131,7 @@ export class ContextSearch {
       
       return results.slice(0, maxResults);
     } catch (_error) {
-      console.error('Error searching by complexity:', error);
+      console.error('Error searching by complexity:', _error);
       return [];
     }
   }

@@ -20,7 +20,11 @@
       "Bash(gh run view:*)",
       "Bash(npm run lint)",
       "Bash(npm run lint:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": []
   }

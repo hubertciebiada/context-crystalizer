@@ -171,7 +171,7 @@ export class QueueManager {
       await fs.mkdir(path.dirname(this.queueStatePath), { recursive: true });
       await fs.writeFile(this.queueStatePath, JSON.stringify(state, null, 2), 'utf-8');
     } catch (_error) {
-      console.error('Failed to save queue state:', error);
+      console.error('Failed to save queue state:', _error);
     }
   }
 

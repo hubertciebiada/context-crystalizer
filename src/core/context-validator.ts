@@ -173,7 +173,7 @@ export class ContextValidator {
         },
       };
     } catch (_error) {
-      console.error('Error generating quality report:', error);
+      console.error('Error generating quality report:', _error);
       return {
         overallScore: 0,
         totalContexts: 0,
