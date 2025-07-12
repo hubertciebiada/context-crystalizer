@@ -9,6 +9,8 @@ import {
 import { FileScanner } from './core/file-scanner.js';
 import { ContextStorage } from './core/context-storage.js';
 import { QueueManager } from './core/queue-manager.js';
+import { ContextSearch } from './core/context-search.js';
+import { ContextValidator } from './core/context-validator.js';
 
 const server = new Server(
   {
@@ -25,6 +27,8 @@ const server = new Server(
 let fileScanner: FileScanner;
 let contextStorage: ContextStorage;
 let queueManager: QueueManager;
+let contextSearch: ContextSearch;
+let contextValidator: ContextValidator;
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
@@ -136,10 +140,111 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'get_context_status',
-      description: 'Get current context generation progress',
+      description: 'Get enhanced context generation progress with AI metrics',
       inputSchema: {
         type: 'object',
         properties: {},
+      },
+    },
+    {
+      name: 'search_context',
+      description: 'Search for relevant AI contexts by functionality or purpose',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: 'Search query (e.g., "authentication middleware", "database connection")',
+          },
+          maxTokens: {
+            type: 'number',
+            description: 'Maximum tokens to return in results (default: 4000)',
+            default: 4000,
+          },
+          category: {
+            type: 'string',
+            enum: ['config', 'source', 'test', 'docs', 'other'],
+            description: 'Filter by file category',
+          },
+        },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'get_context_bundle',
+      description: 'Assemble multiple contexts within token limits for AI analysis',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          files: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'List of relative file paths to include in bundle',
+          },
+          maxTokens: {
+            type: 'number',
+            description: 'Maximum total tokens for the bundle (default: 8000)',
+            default: 8000,
+          },
+        },
+        required: ['files'],
+      },
+    },
+    {
+      name: 'find_related_contexts',
+      description: 'Find contexts related to a specific file for AI exploration',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          filePath: {
+            type: 'string',
+            description: 'Relative path to the file to find related contexts for',
+          },
+          maxResults: {
+            type: 'number',
+            description: 'Maximum number of related contexts to return (default: 5)',
+            default: 5,
+          },
+        },
+        required: ['filePath'],
+      },
+    },
+    {
+      name: 'search_by_complexity',
+      description: 'Find contexts by complexity level for AI learning or analysis',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          complexity: {
+            type: 'string',
+            enum: ['low', 'medium', 'high'],
+            description: 'Complexity level to search for',
+          },
+          maxResults: {
+            type: 'number',
+            description: 'Maximum number of results (default: 10)',
+            default: 10,
+          },
+        },
+        required: ['complexity'],
+      },
+    },
+    {
+      name: 'validate_context_quality',
+      description: 'Validate and assess the quality of generated AI contexts',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          filePath: {
+            type: 'string',
+            description: 'Specific file to validate (optional - validates all if omitted)',
+          },
+          generateReport: {
+            type: 'boolean',
+            description: 'Generate a comprehensive project quality report',
+            default: false,
+          },
+        },
       },
     },
   ],
@@ -158,6 +263,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       fileScanner = new FileScanner(repoPath, exclude);
       contextStorage = new ContextStorage(repoPath);
       queueManager = new QueueManager();
+      contextSearch = new ContextSearch(repoPath);
+      contextValidator = new ContextValidator(repoPath);
 
       const files = await fileScanner.scanRepository();
       await queueManager.initializeQueue(files, repoPath, exclude);
@@ -259,7 +366,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case 'get_context_status': {
-      if (!queueManager) {
+      if (!queueManager || !contextStorage) {
         return {
           content: [
             {
@@ -271,14 +378,263 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       const progress = queueManager.getProgress();
+      const stats = await contextStorage.getContextStatistics();
+      const sessionInfo = queueManager.getSessionInfo();
+
+      const enhancedStatus = {
+        ...progress,
+        contextStats: stats,
+        session: sessionInfo,
+        completionPercentage: progress.totalFiles > 0 ? Math.round((progress.processedFiles / progress.totalFiles) * 100) : 0,
+        estimatedCompletionTime: progress.estimatedTimeRemaining ? new Date(Date.now() + progress.estimatedTimeRemaining).toISOString() : null,
+      };
+
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(progress),
+            text: JSON.stringify(enhancedStatus, null, 2),
           },
         ],
       };
+    }
+
+    case 'search_context': {
+      if (!contextSearch) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Repository not initialized.',
+            },
+          ],
+        };
+      }
+
+      const { query, maxTokens = 4000, category } = args as {
+        query: string;
+        maxTokens?: number;
+        category?: string;
+      };
+
+      const results = await contextSearch.searchContexts(query, maxTokens, category);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              query,
+              results: results.length,
+              totalTokens: results.reduce((sum, r) => sum + (r.context.tokenCount || 0), 0),
+              matches: results.map(r => ({
+                file: r.context.relativePath,
+                relevance: r.relevanceScore,
+                category: r.context.category,
+                complexity: r.context.complexity,
+                tokens: r.context.tokenCount,
+                highlights: r.highlights,
+                purpose: r.context.purpose.substring(0, 150) + '...',
+                keyAPIs: r.context.keyAPIs.slice(0, 3),
+              })),
+            }, null, 2),
+          },
+        ],
+      };
+    }
+
+    case 'get_context_bundle': {
+      if (!contextSearch) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Repository not initialized.',
+            },
+          ],
+        };
+      }
+
+      const { files, maxTokens = 8000 } = args as {
+        files: string[];
+        maxTokens?: number;
+      };
+
+      const bundle = await contextSearch.getContextBundle(files, maxTokens);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              requestedFiles: files.length,
+              includedFiles: bundle.contexts.length,
+              totalTokens: bundle.totalTokens,
+              contexts: bundle.contexts.map(ctx => ({
+                file: ctx.relativePath,
+                purpose: ctx.purpose,
+                keyAPIs: ctx.keyAPIs,
+                dependencies: ctx.dependencies,
+                patterns: ctx.patterns,
+                crossReferences: ctx.crossReferences,
+                complexity: ctx.complexity,
+                category: ctx.category,
+                tokenCount: ctx.tokenCount,
+              })),
+            }, null, 2),
+          },
+        ],
+      };
+    }
+
+    case 'find_related_contexts': {
+      if (!contextSearch) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Repository not initialized.',
+            },
+          ],
+        };
+      }
+
+      const { filePath, maxResults = 5 } = args as {
+        filePath: string;
+        maxResults?: number;
+      };
+
+      const results = await contextSearch.findRelatedContexts(filePath, maxResults);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              sourceFile: filePath,
+              relatedContexts: results.length,
+              matches: results.map(r => ({
+                file: r.context.relativePath,
+                relevance: r.relevanceScore,
+                category: r.context.category,
+                purpose: r.context.purpose.substring(0, 100) + '...',
+                keyAPIs: r.context.keyAPIs.slice(0, 2),
+                relationship: r.highlights.join(', '),
+              })),
+            }, null, 2),
+          },
+        ],
+      };
+    }
+
+    case 'search_by_complexity': {
+      if (!contextSearch) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Repository not initialized.',
+            },
+          ],
+        };
+      }
+
+      const { complexity, maxResults = 10 } = args as {
+        complexity: 'low' | 'medium' | 'high';
+        maxResults?: number;
+      };
+
+      const results = await contextSearch.searchByComplexity(complexity, maxResults);
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              complexity,
+              totalFound: results.length,
+              contexts: results.map(r => ({
+                file: r.context.relativePath,
+                category: r.context.category,
+                purpose: r.context.purpose.substring(0, 100) + '...',
+                keyAPIs: r.context.keyAPIs.slice(0, 3),
+                tokenCount: r.context.tokenCount,
+              })),
+            }, null, 2),
+          },
+        ],
+      };
+    }
+
+    case 'validate_context_quality': {
+      if (!contextValidator) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Repository not initialized.',
+            },
+          ],
+        };
+      }
+
+      const { filePath, generateReport = false } = args as {
+        filePath?: string;
+        generateReport?: boolean;
+      };
+
+      if (generateReport) {
+        const report = await contextValidator.generateProjectQualityReport();
+        
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                type: 'project_quality_report',
+                ...report,
+              }, null, 2),
+            },
+          ],
+        };
+      } else if (filePath) {
+        // Validate specific context
+        const context = await contextSearch?.loadContext?.(filePath);
+        if (!context) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Error: Context not found for ${filePath}`,
+              },
+            ],
+          };
+        }
+
+        const validation = await contextValidator.validateContext(context);
+        
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                type: 'context_validation',
+                file: filePath,
+                ...validation,
+              }, null, 2),
+            },
+          ],
+        };
+      } else {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Either specify a filePath or set generateReport to true',
+            },
+          ],
+        };
+      }
     }
 
     default:
