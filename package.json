@@ -1,0 +1,65 @@
+{
+  "name": "context-crystallizer",
+  "version": "0.1.0",
+  "description": "AI Context Engineering for Large Codebases - Transform massive repositories into crystallized, AI-consumable context",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "context-crystallizer": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "ai",
+    "context",
+    "llm",
+    "codebase",
+    "analysis",
+    "claude",
+    "anthropic"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "glob": "^11.0.0",
+    "ignore": "^6.0.2",
+    "minimatch": "^10.0.1",
+    "p-queue": "^8.0.1",
+    "picomatch": "^4.0.2"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.19.0",
+    "@typescript-eslint/parser": "^8.19.0",
+    "eslint": "^9.17.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/context-crystallizer.git"
+  }
+}

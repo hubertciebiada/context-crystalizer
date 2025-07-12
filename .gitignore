@@ -1,25 +1,54 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dev-debug.log
 
-# Dependency directories
-node_modules/
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Environment variables
-.env
+# Coverage
+coverage/
+*.lcov
+.nyc_output
 
-# Editor directories and files
-.idea
-.vscode
+# IDE
+.vscode/
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+*~
 
-# OS specific
+# OS
 .DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Context Crystallizer output
+.context-crystal/
+
+# Temporary files
+*.tmp
+*.temp

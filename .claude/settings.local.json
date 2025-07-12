@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "mcp__taskmaster-ai__get_tasks",
+      "Bash(mkdir:*)",
+      "Bash(npm install)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)",
+      "mcp__taskmaster-ai__set_task_status"
     ],
     "deny": []
   }
