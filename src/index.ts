@@ -119,7 +119,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       queueManager = new QueueManager();
 
       const files = await fileScanner.scanRepository();
-      queueManager.initializeQueue(files);
+      await queueManager.initializeQueue(files, repoPath, exclude);
 
       return {
         content: [
@@ -192,7 +192,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       await contextStorage.storeContext(filePath, context);
-      queueManager.markProcessed(filePath);
+      await queueManager.markProcessed(filePath);
 
       return {
         content: [

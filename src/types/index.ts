@@ -15,6 +15,11 @@ export interface FileQueueItem {
   relativePath: string;
   size: number;
   priority: number;
+  fileType: string;
+  estimatedTokens: number;
+  complexity: 'low' | 'medium' | 'high';
+  category: 'config' | 'source' | 'test' | 'docs' | 'other';
+  lastModified: Date;
 }
 
 export interface CrystallizationProgress {
@@ -23,6 +28,12 @@ export interface CrystallizationProgress {
   currentFile?: string;
   startTime: Date;
   estimatedTimeRemaining?: number;
+  sessionId: string;
+  totalEstimatedTokens: number;
+  processedTokens: number;
+  avgTokensPerFile: number;
+  filesByCategory: Record<string, number>;
+  processedByCategory: Record<string, number>;
 }
 
 export interface SearchResult {
@@ -35,4 +46,15 @@ export interface ContextBundle {
   contexts: CrystallizedContext[];
   totalTokens: number;
   query: string;
+}
+
+export interface QueueState {
+  sessionId: string;
+  repoPath: string;
+  totalFiles: number;
+  processedFiles: string[];
+  remainingQueue: FileQueueItem[];
+  startTime: Date;
+  lastActivity: Date;
+  excludePatterns: string[];
 }
