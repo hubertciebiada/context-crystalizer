@@ -8,6 +8,32 @@ export interface CrystallizedContext {
   relatedContexts: string[];
   lastModified: Date;
   tokenCount?: number;
+  template: 'short' | 'extended';
+  complexity: 'low' | 'medium' | 'high';
+  category: 'config' | 'source' | 'test' | 'docs' | 'other';
+  crossReferences: CrossReference[];
+  aiGuidance?: string;
+  errorHandling?: string[];
+  integrationPoints?: string[];
+}
+
+export interface CrossReference {
+  type: 'imports' | 'exports' | 'calls' | 'extends' | 'implements' | 'uses';
+  target: string;
+  description?: string;
+}
+
+export interface ContextTemplate {
+  name: string;
+  maxTokens: number;
+  sections: TemplateSection[];
+}
+
+export interface TemplateSection {
+  name: string;
+  required: boolean;
+  maxTokens?: number;
+  format: 'text' | 'list' | 'code' | 'markdown';
 }
 
 export interface FileQueueItem {

@@ -58,7 +58,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'store_ai_context',
-      description: 'Store AI-generated context for a file',
+      description: 'Store AI-generated context for a file with enhanced metadata',
       inputSchema: {
         type: 'object',
         properties: {
@@ -69,25 +69,66 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           context: {
             type: 'object',
             properties: {
-              purpose: { type: 'string' },
+              purpose: { type: 'string', description: 'Primary purpose and functionality' },
               keyAPIs: {
                 type: 'array',
                 items: { type: 'string' },
+                description: 'Key APIs, functions, or exports for AI consumption',
               },
               dependencies: {
                 type: 'array',
                 items: { type: 'string' },
+                description: 'Dependencies and imports',
               },
               patterns: {
                 type: 'array',
                 items: { type: 'string' },
+                description: 'Implementation patterns and conventions',
               },
               relatedContexts: {
                 type: 'array',
                 items: { type: 'string' },
+                description: 'Related files and contexts',
+              },
+              aiGuidance: {
+                type: 'string',
+                description: 'Specific guidance for AI agents working with this code',
+              },
+              errorHandling: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Error handling patterns and strategies',
+              },
+              integrationPoints: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Key integration points with other systems',
               },
             },
             required: ['purpose', 'keyAPIs'],
+          },
+          fileContent: {
+            type: 'string',
+            description: 'Original file content for cross-reference analysis',
+          },
+          fileMetadata: {
+            type: 'object',
+            properties: {
+              complexity: {
+                type: 'string',
+                enum: ['low', 'medium', 'high'],
+                description: 'File complexity level',
+              },
+              category: {
+                type: 'string',
+                enum: ['config', 'source', 'test', 'docs', 'other'],
+                description: 'File category',
+              },
+              estimatedTokens: {
+                type: 'number',
+                description: 'Estimated token count for the file',
+              },
+            },
           },
         },
         required: ['filePath', 'context'],
@@ -120,6 +161,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       const files = await fileScanner.scanRepository();
       await queueManager.initializeQueue(files, repoPath, exclude);
+      
+      // Initialize context storage with all file paths
+      const allFilePaths = files.map(f => f.path);
+      await contextStorage.initialize(allFilePaths);
 
       return {
         content: [
@@ -167,6 +212,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               metadata: {
                 size: nextFile.size,
                 priority: nextFile.priority,
+                fileType: nextFile.fileType,
+                estimatedTokens: nextFile.estimatedTokens,
+                complexity: nextFile.complexity,
+                category: nextFile.category,
+                lastModified: nextFile.lastModified,
               },
             }),
           },
@@ -175,9 +225,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case 'store_ai_context': {
-      const { filePath, context } = args as {
+      const { filePath, context, fileContent, fileMetadata } = args as {
         filePath: string;
         context: any;
+        fileContent?: string;
+        fileMetadata?: { complexity: 'low' | 'medium' | 'high'; category: 'config' | 'source' | 'test' | 'docs' | 'other'; estimatedTokens: number };
       };
 
       if (!contextStorage) {
@@ -191,14 +243,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      await contextStorage.storeContext(filePath, context);
+      await contextStorage.storeContext(filePath, context, fileContent, fileMetadata);
       await queueManager.markProcessed(filePath);
+
+      const stats = await contextStorage.getContextStatistics();
 
       return {
         content: [
           {
             type: 'text',
-            text: `✓ Context stored for ${filePath}`,
+            text: `✓ Context stored for ${filePath}\n📊 Progress: ${stats.totalContexts} contexts, ${stats.totalTokens} total tokens`,
           },
         ],
       };
