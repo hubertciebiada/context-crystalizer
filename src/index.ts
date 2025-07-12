@@ -11,6 +11,8 @@ import { ContextStorage } from './core/context-storage.js';
 import { QueueManager } from './core/queue-manager.js';
 import { ContextSearch } from './core/context-search.js';
 import { ContextValidator } from './core/context-validator.js';
+import { ChangeDetector } from './core/change-detector.js';
+import { ContextUpdater } from './core/context-updater.js';
 
 const server = new Server(
   {
@@ -29,6 +31,8 @@ let contextStorage: ContextStorage;
 let queueManager: QueueManager;
 let contextSearch: ContextSearch;
 let contextValidator: ContextValidator;
+let changeDetector: ChangeDetector;
+let contextUpdater: ContextUpdater;
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
@@ -247,6 +251,40 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         },
       },
     },
+    {
+      name: 'update_context',
+      description: 'Update AI contexts for changed files and maintain freshness',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          forceUpdate: {
+            type: 'boolean',
+            description: 'Force regeneration of all contexts regardless of changes',
+            default: false,
+          },
+          includeUnchanged: {
+            type: 'boolean',
+            description: 'Include files that do not have context yet',
+            default: false,
+          },
+          cleanupDeleted: {
+            type: 'boolean',
+            description: 'Remove contexts for deleted files',
+            default: true,
+          },
+          checkOnly: {
+            type: 'boolean',
+            description: 'Only check status without performing updates',
+            default: false,
+          },
+          generateReport: {
+            type: 'boolean',
+            description: 'Generate a detailed update report',
+            default: false,
+          },
+        },
+      },
+    },
   ],
 }));
 
@@ -265,6 +303,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       queueManager = new QueueManager();
       contextSearch = new ContextSearch(repoPath);
       contextValidator = new ContextValidator(repoPath);
+      changeDetector = new ChangeDetector(repoPath);
+      contextUpdater = new ContextUpdater(repoPath, fileScanner, contextStorage, changeDetector, queueManager);
 
       const files = await fileScanner.scanRepository();
       await queueManager.initializeQueue(files, repoPath, exclude);
@@ -635,6 +675,79 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         };
       }
+    }
+
+    case 'update_context': {
+      if (!contextUpdater) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'Error: Repository not initialized.',
+            },
+          ],
+        };
+      }
+
+      const { 
+        forceUpdate = false,
+        includeUnchanged = false,
+        cleanupDeleted = true,
+        checkOnly = false,
+        generateReport = false
+      } = args as {
+        forceUpdate?: boolean;
+        includeUnchanged?: boolean;
+        cleanupDeleted?: boolean;
+        checkOnly?: boolean;
+        generateReport?: boolean;
+      };
+
+      if (generateReport) {
+        const report = await contextUpdater.generateUpdateReport();
+        return {
+          content: [
+            {
+              type: 'text',
+              text: report,
+            },
+          ],
+        };
+      }
+
+      if (checkOnly) {
+        const status = await contextUpdater.getUpdateStatus();
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+                type: 'update_status',
+                ...status,
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      // Perform the update
+      const updateResult = await contextUpdater.updateContexts({
+        forceUpdate,
+        includeUnchanged,
+        cleanupDeleted,
+      });
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              type: 'update_result',
+              ...updateResult,
+            }, null, 2),
+          },
+        ],
+      };
     }
 
     default:
