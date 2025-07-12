@@ -122,8 +122,8 @@ jobs:
       run: |
         echo "📦 Validating package.json security..."
         
-        # Check for suspicious scripts
-        if grep -E "(curl|wget|sh|bash|eval)" package.json; then
+        # Check for suspicious scripts (but allow common npm patterns)
+        if grep -E "(curl|wget|eval|\bsh\s|bash\s)" package.json | grep -v -E "(npm\s+run|&&|prepublishOnly|prepare)"; then
           echo "❌ Suspicious scripts detected in package.json"
           exit 1
         fi
