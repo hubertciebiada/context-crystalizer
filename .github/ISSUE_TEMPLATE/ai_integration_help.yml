@@ -1,0 +1,148 @@
+name: AI Integration Help
+description: Get help with integrating Context Crystallizer with AI systems
+title: "[Help]: "
+labels: ["help-wanted", "ai-integration"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help integrating Context Crystallizer with your AI system? 
+        We're here to help you get the most out of AI context engineering!
+
+  - type: dropdown
+    id: ai_system
+    attributes:
+      label: AI System
+      description: Which AI system are you trying to integrate with?
+      options:
+        - Claude Desktop (MCP)
+        - Claude API
+        - OpenAI GPT-4/GPT-3.5
+        - Custom AI Agent
+        - LangChain
+        - AutoGPT
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: integration_type
+    attributes:
+      label: Integration Type
+      description: What type of integration are you building?
+      options:
+        - Direct MCP Tool Usage
+        - Custom AI Agent Development
+        - API Integration
+        - Workflow Automation
+        - Code Analysis Pipeline
+        - Documentation Generation
+        - Other (specify in description)
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Integration Goal
+      description: What are you trying to achieve?
+      placeholder: |
+        Describe your use case and what you want your AI system to do with Context Crystallizer...
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_setup
+    attributes:
+      label: Current Setup
+      description: What have you tried so far?
+      placeholder: |
+        - Installation steps completed
+        - Configuration files created
+        - Code written (if any)
+        - Errors encountered
+    validations:
+      required: true
+
+  - type: textarea
+    id: specific_question
+    attributes:
+      label: Specific Questions
+      description: What specific help do you need?
+      placeholder: |
+        - How do I configure MCP for my use case?
+        - Which tools should I use for my workflow?
+        - How do I optimize token usage?
+        - Best practices for context generation?
+    validations:
+      required: true
+
+  - type: textarea
+    id: code_sample
+    attributes:
+      label: Code Sample (if applicable)
+      description: Share relevant code you're working with
+      placeholder: |
+        ```typescript
+        // Your current integration code
+        ```
+      render: typescript
+
+  - type: input
+    id: repository_info
+    attributes:
+      label: Repository Information
+      description: Tell us about the codebase you're analyzing
+      placeholder: "e.g., Node.js REST API, 1000 files, TypeScript"
+
+  - type: textarea
+    id: error_messages
+    attributes:
+      label: Error Messages (if any)
+      description: Any error messages you're encountering
+      render: shell
+
+  - type: dropdown
+    id: experience_level
+    attributes:
+      label: Experience Level
+      description: Your experience with AI/LLM integration
+      options:
+        - Beginner - New to AI integration
+        - Intermediate - Some AI/LLM experience
+        - Advanced - Experienced with AI systems
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Your development environment
+      placeholder: |
+        - OS: 
+        - Node.js version: 
+        - Context Crystallizer version: 
+        - AI client/library: 
+      render: markdown
+
+  - type: checkboxes
+    id: documentation_checked
+    attributes:
+      label: Documentation Review
+      description: Have you reviewed the available documentation?
+      options:
+        - label: I have read the README.md
+        - label: I have tried the quick start guide
+        - label: I have searched existing issues
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: |
+        - Timeline or urgency
+        - Team size or collaboration needs
+        - Performance requirements
+        - Specific constraints or requirements

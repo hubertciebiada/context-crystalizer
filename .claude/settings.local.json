@@ -10,7 +10,9 @@
       "mcp__taskmaster-ai__set_task_status",
       "Bash(npm test)",
       "Bash(npm test:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run clean:*)",
+      "Bash(npm pack:*)"
     ],
     "deny": []
   }

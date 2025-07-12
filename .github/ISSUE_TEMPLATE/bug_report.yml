@@ -1,0 +1,146 @@
+name: Bug Report
+description: Report a bug in Context Crystallizer AI workflows
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug in Context Crystallizer! 
+        Please provide as much detail as possible to help us diagnose and fix the issue.
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component is affected?
+      options:
+        - MCP Tools (init_crystallization, search_context, etc.)
+        - Context Generation (AI context creation)
+        - Search & Retrieval (finding relevant contexts)
+        - Quality Validation (context quality checks)
+        - Update Detection (change tracking)
+        - Installation/Setup
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ai_integration
+    attributes:
+      label: AI Integration
+      description: Which AI system are you using?
+      options:
+        - Claude Desktop (MCP)
+        - Custom AI Agent
+        - OpenAI API
+        - Other AI System
+        - Not AI-related
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of the bug
+      placeholder: Describe what went wrong...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Initialize repository with `init_crystallization`
+        2. Call `search_context` with query "..."
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: Describe the expected result...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: Describe what actually happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: mcp_call
+    attributes:
+      label: MCP Tool Call (if applicable)
+      description: The exact MCP tool call that caused the issue
+      placeholder: |
+        ```json
+        {
+          "tool": "search_context",
+          "arguments": {
+            "query": "authentication middleware",
+            "maxTokens": 4000
+          }
+        }
+        ```
+      render: json
+
+  - type: textarea
+    id: error_output
+    attributes:
+      label: Error Output
+      description: Any error messages or logs
+      placeholder: Paste error messages here...
+      render: shell
+
+  - type: input
+    id: repository_size
+    attributes:
+      label: Repository Size
+      description: Approximate size of the repository being analyzed
+      placeholder: "e.g., 500 files, 50MB"
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Your development environment
+      placeholder: |
+        - OS: macOS 14.0
+        - Node.js: 18.17.0
+        - Context Crystallizer: 1.0.0
+        - AI Client: Claude Desktop 1.2.0
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem
+      placeholder: Add any other relevant information...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have provided sufficient information to reproduce the issue
+          required: true
+        - label: This issue is related to Context Crystallizer functionality
+          required: true

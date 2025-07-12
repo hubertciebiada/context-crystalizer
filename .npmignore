@@ -1,0 +1,66 @@
+# Source files
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Development files
+.taskmaster/
+.claude/
+.idea/
+.vscode/
+
+# Build artifacts
+node_modules/
+coverage/
+*.tsbuildinfo
+
+# Development configs
+jest.config.js
+.eslintrc.json
+tsconfig.json
+
+# Git files
+.git/
+.gitignore
+
+# Documentation (except what's in package.json files array)
+docs/
+*.md
+!README.md
+!LICENSE.md
+!CONTRIBUTING.md
+
+# GitHub templates
+.github/
+
+# Environment files
+.env*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Runtime data
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary files
+.tmp/
+.temp/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~

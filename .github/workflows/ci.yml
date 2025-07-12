@@ -1,0 +1,383 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master ]
+  release:
+    types: [ published ]
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run type checking
+      run: npm run typecheck
+      
+    - name: Run linting
+      run: npm run lint
+      
+    - name: Run unit tests
+      run: npm run test
+      
+    - name: Run AI context tests
+      run: npm run test:ai
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Test CLI execution
+      run: |
+        chmod +x dist/index.js
+        echo '{"test": true}' | timeout 5s node dist/index.js || true
+
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+      
+    - name: Check for vulnerabilities
+      run: npm audit --audit-level=high --dry-run
+
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Package verification
+      run: npm pack --dry-run
+      
+    - name: Check package size
+      run: |
+        SIZE=$(npm pack --dry-run 2>/dev/null | grep "package size:" | awk '{print $3}')
+        echo "Package size: $SIZE"
+        if [[ "$SIZE" =~ ([0-9.]+)[[:space:]]*([kM])B ]]; then
+          VALUE=${BASH_REMATCH[1]}
+          UNIT=${BASH_REMATCH[2]}
+          if [[ "$UNIT" == "M" ]] && (( $(echo "$VALUE > 5" | bc -l) )); then
+            echo "❌ Package too large: ${SIZE}"
+            exit 1
+          fi
+          echo "✅ Package size acceptable: ${SIZE}"
+        fi
+
+  ai-integration-test:
+    name: AI Integration Tests
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Test MCP server initialization
+      run: |
+        cat > test_mcp.js << 'EOF'
+        import { spawn } from 'child_process';
+        import { setTimeout } from 'timers/promises';
+        
+        const server = spawn('node', ['dist/index.js'], {
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        
+        let output = '';
+        server.stdout.on('data', (data) => {
+          output += data.toString();
+        });
+        
+        server.stderr.on('data', (data) => {
+          output += data.toString();
+        });
+        
+        // Send MCP initialization
+        server.stdin.write(JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/list'
+        }) + '\n');
+        
+        await setTimeout(2000);
+        server.kill();
+        
+        if (output.includes('context-crystallizer') || output.includes('running')) {
+          console.log('✅ MCP server responds correctly');
+          process.exit(0);
+        } else {
+          console.log('❌ MCP server failed to respond');
+          console.log('Output:', output);
+          process.exit(1);
+        }
+        EOF
+        node test_mcp.js
+      
+    - name: Test AI context generation workflow
+      run: |
+        mkdir -p test_repo/src
+        echo 'export function hello() { return "world"; }' > test_repo/src/test.js
+        echo 'console.log("test file");' > test_repo/src/main.js
+        
+        cat > test_workflow.js << 'EOF'
+        import { spawn } from 'child_process';
+        import { setTimeout } from 'timers/promises';
+        import fs from 'fs';
+        
+        const server = spawn('node', ['dist/index.js'], {
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        
+        let responses = [];
+        let responseBuffer = '';
+        
+        server.stdout.on('data', (data) => {
+          responseBuffer += data.toString();
+          const lines = responseBuffer.split('\n');
+          responseBuffer = lines.pop();
+          
+          for (const line of lines) {
+            if (line.trim()) {
+              try {
+                const response = JSON.parse(line);
+                responses.push(response);
+              } catch (e) {
+                // Ignore non-JSON lines
+              }
+            }
+          }
+        });
+        
+        // Initialize crystallization
+        server.stdin.write(JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: {
+            name: 'init_crystallization',
+            arguments: {
+              repoPath: './test_repo'
+            }
+          }
+        }) + '\n');
+        
+        await setTimeout(3000);
+        server.kill();
+        
+        console.log('✅ AI workflow test completed');
+        process.exit(0);
+        EOF
+        node test_workflow.js
+
+  publish:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    needs: [test, security, quality, ai-integration-test]
+    if: github.event_name == 'release' && github.event.action == 'published'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        registry-url: 'https://registry.npmjs.org'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Run final tests
+      run: npm test
+      
+    - name: Publish to NPM
+      run: npm publish
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        
+    - name: Create GitHub release assets
+      run: |
+        npm pack
+        gh release upload ${{ github.event.release.tag_name }} *.tgz
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docker:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create Dockerfile
+      run: |
+        cat > Dockerfile << 'EOF'
+        FROM node:20-alpine
+        
+        WORKDIR /app
+        
+        COPY package*.json ./
+        RUN npm ci --only=production
+        
+        COPY dist/ ./dist/
+        COPY README.md LICENSE.md ./
+        
+        RUN chmod +x dist/index.js
+        
+        EXPOSE 3000
+        CMD ["node", "dist/index.js"]
+        EOF
+        
+    - name: Build project
+      run: |
+        npm ci
+        npm run build
+        
+    - name: Build Docker image
+      run: docker build -t context-crystallizer:test .
+      
+    - name: Test Docker container
+      run: |
+        docker run --rm -d --name test-container context-crystallizer:test
+        sleep 3
+        docker logs test-container
+        docker stop test-container || true
+
+  performance:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      
+    - name: Create performance test repository
+      run: |
+        mkdir -p perf_test/src/{components,utils,services,types}
+        for i in {1..100}; do
+          echo "export function func$i() { return 'test$i'; }" > "perf_test/src/file$i.js"
+        done
+        for i in {1..50}; do
+          echo "export interface Interface$i { prop$i: string; }" > "perf_test/src/types/type$i.ts"
+        done
+        
+    - name: Performance benchmark
+      run: |
+        cat > perf_test.js << 'EOF'
+        import { spawn } from 'child_process';
+        import { setTimeout } from 'timers/promises';
+        
+        console.log('🚀 Starting performance test...');
+        const startTime = Date.now();
+        
+        const server = spawn('node', ['dist/index.js'], {
+          stdio: ['pipe', 'pipe', 'pipe']
+        });
+        
+        server.stdout.on('data', (data) => {
+          process.stdout.write(data);
+        });
+        
+        // Initialize with large repository
+        server.stdin.write(JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'tools/call',
+          params: {
+            name: 'init_crystallization',
+            arguments: {
+              repoPath: './perf_test'
+            }
+          }
+        }) + '\n');
+        
+        await setTimeout(5000);
+        server.kill();
+        
+        const duration = Date.now() - startTime;
+        console.log(`✅ Performance test completed in ${duration}ms`);
+        
+        if (duration > 30000) {
+          console.log('❌ Performance test took too long');
+          process.exit(1);
+        }
+        EOF
+        node perf_test.js

@@ -1,0 +1,188 @@
+name: Dependency Review
+
+on:
+  pull_request:
+    paths:
+      - 'package.json'
+      - 'package-lock.json'
+  schedule:
+    - cron: '0 2 * * 1' # Weekly on Monday at 2 AM UTC
+
+jobs:
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v4
+      with:
+        fail-on-severity: moderate
+        allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
+        deny-licenses: GPL-2.0, GPL-3.0, AGPL-1.0, AGPL-3.0
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run npm audit
+      run: |
+        npm audit --audit-level=moderate --json > audit-results.json || true
+        if [ -s audit-results.json ]; then
+          echo "🔍 Security vulnerabilities found:"
+          cat audit-results.json | jq '.vulnerabilities'
+          
+          HIGH_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.high // 0')
+          CRITICAL_VULNS=$(cat audit-results.json | jq '.metadata.vulnerabilities.critical // 0')
+          
+          if [ "$HIGH_VULNS" -gt 0 ] || [ "$CRITICAL_VULNS" -gt 0 ]; then
+            echo "❌ Found $HIGH_VULNS high and $CRITICAL_VULNS critical vulnerabilities"
+            exit 1
+          else
+            echo "✅ No critical or high severity vulnerabilities found"
+          fi
+        else
+          echo "✅ No vulnerabilities found"
+        fi
+        
+    - name: Check for outdated packages
+      run: |
+        echo "📦 Checking for outdated packages..."
+        npm outdated --json > outdated.json || true
+        if [ -s outdated.json ]; then
+          echo "📋 Outdated packages found:"
+          cat outdated.json | jq '.'
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📦 Outdated Dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | Current | Wanted | Latest |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|---------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          cat outdated.json | jq -r 'to_entries[] | "| \(.key) | \(.value.current) | \(.value.wanted) | \(.value.latest) |"' >> $GITHUB_STEP_SUMMARY
+        else
+          echo "✅ All packages are up to date"
+        fi
+
+  license-check:
+    name: License Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Install license checker
+      run: npm install -g license-checker
+      
+    - name: Check licenses
+      run: |
+        echo "📄 Checking dependency licenses..."
+        license-checker --json --excludePrivatePackages > licenses.json
+        
+        # Check for problematic licenses
+        PROBLEMATIC_LICENSES=("GPL-2.0" "GPL-3.0" "AGPL-1.0" "AGPL-3.0" "LGPL-2.1" "LGPL-3.0")
+        
+        echo "🔍 Scanning for problematic licenses..."
+        for license in "${PROBLEMATIC_LICENSES[@]}"; do
+          if cat licenses.json | jq -r '.[] | select(.licenses | contains("'"$license"'")) | keys[]' | head -1; then
+            echo "❌ Found problematic license: $license"
+            cat licenses.json | jq -r '.[] | select(.licenses | contains("'"$license"'"))'
+            exit 1
+          fi
+        done
+        
+        echo "✅ All licenses are compliant"
+        
+        # Generate license summary
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📄 License Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        cat licenses.json | jq -r 'group_by(.licenses) | .[] | "- **\(.[0].licenses)**: \(length) packages"' >> $GITHUB_STEP_SUMMARY
+
+  update-dependencies:
+    name: Auto Update Dependencies
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Update dependencies
+      run: |
+        npm update
+        npm audit fix --force
+        
+    - name: Check for changes
+      id: changes
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "changes=true" >> $GITHUB_OUTPUT
+          echo "📦 Dependencies updated"
+        else
+          echo "changes=false" >> $GITHUB_OUTPUT
+          echo "✅ No dependency updates needed"
+        fi
+        
+    - name: Create Pull Request
+      if: steps.changes.outputs.changes == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update dependencies'
+        title: '🤖 Automated dependency updates'
+        body: |
+          ## 🤖 Automated Dependency Updates
+          
+          This PR contains automated dependency updates generated by the weekly dependency scan.
+          
+          ### Changes
+          - Updated npm dependencies to latest compatible versions
+          - Applied automated security fixes
+          
+          ### Verification
+          - [ ] All tests pass
+          - [ ] No breaking changes detected
+          - [ ] Security audit clean
+          
+          This PR was automatically generated by GitHub Actions.
+        branch: chore/dependency-updates
+        delete-branch: true

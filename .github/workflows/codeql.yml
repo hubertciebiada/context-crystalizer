@@ -1,0 +1,136 @@
+name: CodeQL Security Analysis
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    - cron: '30 3 * * 2' # Weekly on Tuesday at 3:30 AM UTC
+
+jobs:
+  analyze:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: +security-and-quality
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+  security-scan:
+    name: Additional Security Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Scan for secrets
+      run: |
+        echo "🔍 Scanning for potential secrets..."
+        
+        # Check for common secret patterns
+        SECRETS_FOUND=false
+        
+        # API keys
+        if grep -r -E "(api[_-]?key|apikey)[\"'\s]*[:=][\"'\s]*[a-zA-Z0-9]{20,}" src/ --exclude-dir=node_modules || true; then
+          echo "❌ Potential API keys found"
+          SECRETS_FOUND=true
+        fi
+        
+        # Private keys
+        if grep -r "BEGIN.*PRIVATE.*KEY" src/ --exclude-dir=node_modules || true; then
+          echo "❌ Private keys found"
+          SECRETS_FOUND=true
+        fi
+        
+        # Tokens
+        if grep -r -E "(token|access[_-]?token)[\"'\s]*[:=][\"'\s]*[a-zA-Z0-9]{20,}" src/ --exclude-dir=node_modules || true; then
+          echo "❌ Potential tokens found"
+          SECRETS_FOUND=true
+        fi
+        
+        # Passwords
+        if grep -r -E "(password|pwd)[\"'\s]*[:=][\"'\s]*[^\s\"']{8,}" src/ --exclude-dir=node_modules || true; then
+          echo "❌ Potential passwords found"
+          SECRETS_FOUND=true
+        fi
+        
+        if [ "$SECRETS_FOUND" = true ]; then
+          echo "❌ Security scan failed - potential secrets detected"
+          exit 1
+        else
+          echo "✅ No secrets detected"
+        fi
+        
+    - name: Check file permissions
+      run: |
+        echo "🔒 Checking file permissions..."
+        
+        # Check for executable files that shouldn't be
+        find src/ -name "*.js" -o -name "*.ts" -o -name "*.json" | while read file; do
+          if [ -x "$file" ] && [ "$file" != "src/index.ts" ]; then
+            echo "❌ Unexpected executable file: $file"
+            exit 1
+          fi
+        done
+        
+        echo "✅ File permissions look correct"
+        
+    - name: Validate package.json security
+      run: |
+        echo "📦 Validating package.json security..."
+        
+        # Check for suspicious scripts
+        if grep -E "(curl|wget|sh|bash|eval)" package.json; then
+          echo "❌ Suspicious scripts detected in package.json"
+          exit 1
+        fi
+        
+        # Check for git hooks
+        if grep -E "husky|pre-commit|post-install" package.json; then
+          echo "⚠️ Git hooks detected - ensure they are secure"
+        fi
+        
+        echo "✅ Package.json security validation passed"

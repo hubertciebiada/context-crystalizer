@@ -1,0 +1,144 @@
+name: Feature Request
+description: Suggest a feature for Context Crystallizer AI workflows
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature for Context Crystallizer! 
+        We're especially interested in improvements that enhance AI agent workflows and context engineering capabilities.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - New MCP Tool
+        - AI Context Engineering Enhancement
+        - Search & Retrieval Improvement
+        - Quality Validation Enhancement
+        - Performance Optimization
+        - Integration with AI Systems
+        - Developer Experience
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to your AI workflows?
+      options:
+        - Critical - Blocks AI agent functionality
+        - High - Significantly improves AI workflows
+        - Medium - Nice to have for AI agents
+        - Low - Minor improvement
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve for AI agents?
+      placeholder: |
+        Describe the current limitation or pain point that AI agents face when working with large codebases...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this feature to work?
+      placeholder: |
+        Describe your ideal solution in detail. If this is a new MCP tool, describe its purpose, parameters, and expected output...
+    validations:
+      required: true
+
+  - type: textarea
+    id: ai_workflow
+    attributes:
+      label: AI Workflow Impact
+      description: How would this feature improve AI agent workflows?
+      placeholder: |
+        Explain how AI agents would use this feature and what benefits it would provide...
+    validations:
+      required: true
+
+  - type: textarea
+    id: api_design
+    attributes:
+      label: API Design (if applicable)
+      description: If this is a new MCP tool or API change, describe the interface
+      placeholder: |
+        ```typescript
+        // Example MCP tool call
+        await callTool("new_tool_name", {
+          parameter1: "value",
+          parameter2: 123
+        });
+        
+        // Expected response format
+        {
+          "results": [...],
+          "metadata": {...}
+        }
+        ```
+      render: typescript
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Usage Examples
+      description: Provide concrete examples of how this feature would be used
+      placeholder: |
+        Show specific scenarios where AI agents would benefit from this feature...
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Have you considered alternative approaches?
+      placeholder: |
+        Describe any workarounds you're currently using or other solutions you've considered...
+
+  - type: dropdown
+    id: willing_to_contribute
+    attributes:
+      label: Implementation
+      description: Are you willing to help implement this feature?
+      options:
+        - "Yes, I can implement this"
+        - "Yes, I can help with testing"
+        - "Yes, I can help with documentation"
+        - "No, but I can provide feedback"
+        - "No, I cannot contribute to implementation"
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: |
+        - Links to related issues or discussions
+        - Screenshots or mockups
+        - Performance considerations
+        - Compatibility requirements
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues and feature requests
+          required: true
+        - label: This feature would benefit AI agent workflows with large codebases
+          required: true
+        - label: I have provided sufficient detail for the feature to be evaluated
+          required: true

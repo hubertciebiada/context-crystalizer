@@ -74,9 +74,6 @@ export class ContextUpdater {
 
       // Get files needing context (new files without context)
       const filesNeedingContext = await this.changeDetector.getFilesNeedingContext(currentFiles);
-      
-      // Get outdated contexts (modified files)
-      const outdatedContexts = await this.changeDetector.getOutdatedContexts(changeResult.changes);
 
       // Prepare update queue
       const updateQueue: FileQueueItem[] = [];

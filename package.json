@@ -1,12 +1,12 @@
 {
   "name": "context-crystallizer",
-  "version": "0.1.0",
-  "description": "AI Context Engineering for Large Codebases - Transform massive repositories into crystallized, AI-consumable context",
+  "version": "1.0.0",
+  "description": "AI Context Engineering for Large Codebases - Transform massive repositories into crystallized, AI-consumable context through systematic analysis and optimization",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "context-crystallizer": "./dist/cli.js"
+    "context-crystallizer": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -14,21 +14,42 @@
     "start": "node dist/index.js",
     "test": "jest",
     "test:watch": "jest --watch",
+    "test:ai": "jest --testPathPattern=\"ai|context|mcp\"",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run test && npm run build",
+    "clean": "rm -rf dist",
+    "dev:mcp": "tsx src/index.ts"
   },
   "keywords": [
     "mcp",
     "ai",
-    "context",
+    "context-engineering",
     "llm",
-    "codebase",
-    "analysis",
+    "codebase-analysis",
+    "ai-agents",
     "claude",
-    "anthropic"
+    "anthropic",
+    "code-understanding",
+    "context-crystallization",
+    "semantic-search",
+    "token-optimization",
+    "enterprise-code",
+    "ai-workflows"
   ],
-  "author": "",
+  "author": {
+    "name": "Hubert Ciebiada",
+    "email": "hubert.ciebiada@gmail.com",
+    "url": "https://github.com/hciebiada"
+  },
+  "contributors": [
+    {
+      "name": "Claude (Anthropic AI)",
+      "email": "noreply@anthropic.com",
+      "url": "https://claude.ai"
+    }
+  ],
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
@@ -56,10 +77,18 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE.md",
+    "CONTRIBUTING.md"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/context-crystallizer.git"
+    "url": "https://github.com/hciebiada/context-crystallizer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hciebiada/context-crystallizer/issues"
+  },
+  "homepage": "https://github.com/hciebiada/context-crystallizer#readme",
+  "publishConfig": {
+    "access": "public"
   }
 }
