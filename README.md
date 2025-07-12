@@ -2,7 +2,7 @@
 
 **AI Context Engineering for Large Codebases**
 
-Transform massive repositories into crystallized, AI-consumable context. Like applying pressure to carbon to create diamonds, Context Crystallizer applies systematic analysis to code, producing clear, searchable context optimized for AI agents working with enterprise-scale projects.
+Transform massive repositories into crystallized, AI-consumable context through systematic analysis and optimization. Enable AI agents to work effectively with enterprise-scale projects by providing token-efficient, LLM-optimized context.
 
 ## The Problem 🔥
 
@@ -100,6 +100,8 @@ JWT authentication middleware for API requests
 
 ## MCP Tools for AI Agents
 
+10 specialized tools for systematic codebase analysis:
+
 | Tool | Purpose | AI Usage |
 |------|---------|----------|
 | `init_crystallization(repo_path)` | Prepare codebase | Initialize large repo analysis |
@@ -107,6 +109,11 @@ JWT authentication middleware for API requests
 | `store_ai_context(file, context)` | Save optimized context | Store AI-generated analysis |
 | `search_context(query, max_tokens)` | Find relevant context | Retrieve context for tasks |
 | `get_context_bundle(files, max_tokens)` | Assemble multi-file context | Understand complex workflows |
+| `find_related_contexts(file)` | Discover relationships | Explore code connections |
+| `validate_context_quality(file)` | Check context quality | Ensure AI-consumable output |
+| `update_context()` | Refresh stale contexts | Maintain accuracy over time |
+| `search_by_complexity(level)` | Find by difficulty | Learn patterns systematically |
+| `get_context_status()` | Monitor progress | Track analysis completion |
 
 ## Performance Metrics
 
@@ -118,40 +125,123 @@ JWT authentication middleware for API requests
 
 ## Installation & Setup
 
+### Quick Start (5 minutes)
+
 ```bash
 # Install globally via NPM
 npm install -g context-crystallizer
 
-# Start the MCP server (connects to Claude Desktop, etc.)
-context-crystallizer
+# Navigate to your project
+cd /path/to/your/project
 
-# Or use directly with MCP clients
+# Start the MCP server
+context-crystallizer
 ```
 
-## Use Cases
+### Claude Desktop Integration
+
+Add to your Claude Desktop configuration (`~/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "context-crystallizer": {
+      "command": "npx",
+      "args": ["context-crystallizer"],
+      "cwd": "/path/to/your/project"
+    }
+  }
+}
+```
+
+### First Analysis
+
+```typescript
+// 1. Initialize repository
+await callTool("init_crystallization", {
+  repoPath: "/workspace/my-project"
+});
+
+// 2. Get first file for analysis
+const file = await callTool("get_next_file", {});
+
+// 3. Generate AI context (use your AI model)
+const context = {
+  purpose: "Main application entry point that configures Express server",
+  keyAPIs: ["app.listen", "configureRoutes", "setupMiddleware"],
+  dependencies: ["express", "./routes", "./middleware"],
+  patterns: ["Express.js framework", "Middleware pattern"]
+};
+
+// 4. Store the optimized context
+await callTool("store_ai_context", {
+  filePath: file.relativePath,
+  context,
+  fileContent: file.content,
+  fileMetadata: file.metadata
+});
+
+// 5. Search for functionality
+const authResults = await callTool("search_context", {
+  query: "authentication middleware",
+  maxTokens: 4000
+});
+```
+
+## Common Use Cases
 
 ### 🔧 **Feature Implementation**
 AI agent needs to add OAuth login to existing auth system
-```bash
-search_context("authentication login OAuth", max_tokens=3000)
-→ Returns relevant auth context within token limits
-→ AI implements OAuth following existing patterns
+```typescript
+const authContext = await callTool("search_context", {
+  query: "authentication login OAuth middleware",
+  maxTokens: 3000
+});
+// Returns relevant auth context within token limits
+// AI implements OAuth following existing patterns
 ```
 
 ### 🔍 **Code Review** 
 AI reviewing changes to payment processing
-```bash
-get_context_bundle(["payments/", "api/billing/"], max_tokens=5000)
-→ Returns comprehensive payment system context
-→ AI reviews for security, patterns, integration issues
+```typescript
+const paymentBundle = await callTool("get_context_bundle", {
+  files: ["src/payments/", "src/api/billing/"],
+  maxTokens: 5000
+});
+// Returns comprehensive payment system context
+// AI reviews for security, patterns, integration issues
 ```
 
 ### 📚 **Documentation Generation**
 AI creating API documentation
-```bash
-search_context("public API endpoints", max_tokens=8000)
-→ Returns all public API context
-→ AI generates comprehensive, accurate documentation
+```typescript
+const apiContext = await callTool("search_context", {
+  query: "public API endpoints controllers",
+  maxTokens: 8000
+});
+// Returns all public API context
+// AI generates comprehensive, accurate documentation
+```
+
+### 🐛 **Debugging Assistance**
+AI helping debug authentication issues
+```typescript
+const authFile = "src/middleware/auth.ts";
+const relatedContexts = await callTool("find_related_contexts", {
+  filePath: authFile,
+  maxResults: 5
+});
+// Discovers related auth components for comprehensive debugging
+```
+
+### 🔄 **Refactoring Support**
+AI analyzing complex files for improvement opportunities
+```typescript
+const complexFiles = await callTool("search_by_complexity", {
+  complexity: "high",
+  maxResults: 10
+});
+// Identifies candidates for refactoring based on complexity
 ```
 
 ## Why "Crystallizer"? 
@@ -163,25 +253,66 @@ Like applying **pressure** to carbon creates diamonds, Context Crystallizer appl
 - 🔍 **Enables clear vision** through complex systems
 - ⚡ **Optimizes for AI consumption** with perfect clarity
 
+## Advanced Features
+
+### Context Quality Validation
+```typescript
+// Check context quality with detailed metrics
+const validation = await callTool("validate_context_quality", {
+  filePath: "src/services/UserService.ts"
+});
+// Returns completeness, accuracy, and AI-readability scores
+
+// Generate project-wide quality report
+const qualityReport = await callTool("validate_context_quality", {
+  generateReport: true
+});
+// Comprehensive analysis with recommendations
+```
+
+### Incremental Updates
+```typescript
+// Detect and update only changed files
+const updateResult = await callTool("update_context", {
+  forceUpdate: false,        // Only update changed files
+  includeUnchanged: false,   // Skip files without context
+  cleanupDeleted: true       // Remove obsolete contexts
+});
+// Maintains context freshness efficiently
+```
+
+### Token Optimization Strategies
+- **Short Template** (≤200 tokens): Config files, types, constants
+- **Extended Template** (≤2000 tokens): Controllers, services, complex logic
+- **Smart Assembly**: Combines multiple contexts within LLM limits
+- **Relevance Scoring**: Prioritizes most relevant contexts for queries
+
+## Troubleshooting
+
+### Common Issues
+- **"Repository not initialized"**: Run `init_crystallization` first
+- **Empty search results**: Ensure contexts are generated for your files
+- **Token limit exceeded**: Reduce `maxTokens` parameter in queries
+- **Stale contexts**: Use `update_context` to refresh outdated information
+
+### Performance Tips
+- Process files in batches for large repositories
+- Use category filters to narrow searches
+- Cache frequently accessed contexts
+- Update incrementally using change detection
+
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Focus on AI workflow improvements:
 
 - 🐛 **Bug Reports**: Use our issue templates
-- 💡 **Feature Requests**: Focus on AI workflow improvements  
+- 💡 **Feature Requests**: Enhance AI context engineering capabilities  
 - 🔧 **Pull Requests**: Include AI context validation tests
 - 💬 **Discussions**: Share AI integration patterns
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Support
-
-- 📖 **Documentation**: [docs/](docs/)
-- 💬 **Discussions**: GitHub Discussions
-- 🐛 **Issues**: GitHub Issues
-- 📧 **Email**: [support@context-crystallizer.dev](mailto:support@context-crystallizer.dev)
+MIT License - see [LICENSE.md](LICENSE.md) for details.
 
 ---
 
