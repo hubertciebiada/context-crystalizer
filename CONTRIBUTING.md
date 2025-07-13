@@ -1,9 +1,10 @@
 # Contributing to Context Crystallizer
 
-Thank you for your interest in contributing to Context Crystallizer! We welcome contributions that enhance AI context engineering capabilities and improve workflows for AI agents working with large codebases.
+Thank you for your interest in contributing to Context Crystallizer! We welcome contributions that enhance AI context engineering capabilities and improve workflows for AI agents working with large repositories through crystallization.
 
 ## Table of Contents
 
+- [Terminology Dictionary](#terminology-dictionary)
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
@@ -14,6 +15,24 @@ Thank you for your interest in contributing to Context Crystallizer! We welcome 
 - [Code Standards](#code-standards)
 - [Pull Request Process](#pull-request-process)
 - [Community](#community)
+
+## Terminology Dictionary
+
+**Core Terms for Context Crystallizer:**
+
+- **Repository**: Any large collection of readable files (code, documentation, markdown, config files, etc.) - not limited to source code
+- **Crystallization**: The systematic process of scanning a repository and analyzing each file to extract meaningful, AI-consumable knowledge. Like how pressure transforms carbon into diamonds, crystallization transforms raw files into structured, optimized knowledge
+- **Crystallized Context**: The AI-optimized knowledge extracted and stored from files - our structured output that makes large repositories understandable to AI
+- **Context** (alone): The raw data/content within the repository before crystallization
+- **Crystallized Context Base**: The `.context-crystallizer/` directory containing all crystallized contexts and metadata
+- **Crystallized Context Index**: Searchable catalog of all crystallized contexts in the repository
+
+**Consistency Rules:**
+- Always use "crystallized context" when referring to our processed output
+- Use "context" alone only when referring to raw repository content
+- "Crystallization" describes the transformation process
+- Package name: "context-crystallizer" (with double 'l')
+- Directory: `.context-crystallizer/` (never `.context-crystal/`)
 
 ## Code of Conduct
 
@@ -26,7 +45,7 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 - **Node.js** 18.0 or higher
 - **npm** 8.0 or higher
 - **TypeScript** knowledge for core development
-- **Understanding of AI/LLM workflows** for context engineering contributions
+- **Understanding of AI/LLM workflows** for crystallization engineering contributions
 
 ### Quick Development Setup
 
@@ -45,23 +64,23 @@ npm run build
 npm run dev
 ```
 
-## AI Context Engineering Focus
+## AI Crystallization Engineering Focus
 
-Context Crystallizer is specifically designed for **AI context engineering**. When contributing, please consider:
+Context Crystallizer is specifically designed for **AI crystallization engineering**. When contributing, please consider:
 
 ### Core Principles
 
 1. **AI-First Design**: Features should primarily benefit AI agents and LLM workflows
 2. **Token Efficiency**: Optimize for LLM token usage and context windows
-3. **Semantic Understanding**: Enable AI agents to find and understand code by functionality
+3. **Semantic Understanding**: Enable AI agents to find and understand repository content by functionality
 4. **Scalability**: Support enterprise-scale repositories (10,000+ files)
-5. **Quality Assurance**: Maintain high-quality, AI-consumable contexts
+5. **Quality Assurance**: Maintain high-quality, AI-consumable crystallized contexts
 
 ### AI Workflow Considerations
 
-- **Context Generation**: How does this improve AI's understanding of code?
-- **Search Relevance**: Does this help AI agents find relevant information faster?
-- **Token Optimization**: Does this reduce token usage while maintaining quality?
+- **Crystallization Quality**: How does this improve AI's understanding of repository content?
+- **Search Relevance**: Does this help AI agents find relevant crystallized contexts faster?
+- **Token Optimization**: Does this reduce token usage while maintaining crystallization quality?
 - **Integration Patterns**: How does this fit with existing AI agent workflows?
 
 ## Contribution Types
@@ -73,10 +92,10 @@ Context Crystallizer is specifically designed for **AI context engineering**. Wh
 - Add new tools for AI workflows
 - Optimize performance for large repositories
 
-**Context Generation**
-- Enhance AI context templates
+**Crystallization Generation**
+- Enhance AI crystallized context templates
 - Improve cross-reference analysis
-- Add support for new programming languages
+- Add support for new file types and programming languages
 
 **Search & Retrieval**
 - Improve semantic search algorithms
@@ -109,8 +128,8 @@ Context Crystallizer is specifically designed for **AI context engineering**. Wh
 
 ### 🧪 Testing & Quality
 
-**AI Context Testing**
-- Develop context quality metrics
+**AI Crystallization Testing**
+- Develop crystallized context quality metrics
 - Add AI workflow test cases
 - Create performance benchmarks
 
@@ -171,8 +190,8 @@ For this MVP, testing is done manually:
 
 ### Test Requirements for AI Features
 
-1. **Context Generation Tests**
-   - Validate context completeness and accuracy
+1. **Crystallization Tests**
+   - Validate crystallized context completeness and accuracy
    - Check token efficiency (target 5:1 compression)
    - Verify AI-readability scores
 
@@ -189,18 +208,18 @@ For this MVP, testing is done manually:
 ### Writing Tests for AI Features
 
 ```typescript
-// Example: Testing context generation quality
-describe('AI Context Generation', () => {
-  test('should generate high-quality context for complex files', async () => {
-    const context = await generateContext(complexFile);
+// Example: Testing crystallization quality
+describe('AI Crystallization', () => {
+  test('should generate high-quality crystallized context for complex files', async () => {
+    const crystallizedContext = await generateCrystallizedContext(complexFile);
     
     // Quality checks
-    expect(context.purpose).toBeTruthy();
-    expect(context.keyAPIs.length).toBeGreaterThan(0);
-    expect(context.tokenCount).toBeLessThanOrEqual(2000);
+    expect(crystallizedContext.purpose).toBeTruthy();
+    expect(crystallizedContext.keyAPIs.length).toBeGreaterThan(0);
+    expect(crystallizedContext.tokenCount).toBeLessThanOrEqual(2000);
     
     // AI-specific validations
-    const validation = await validateContextQuality(context);
+    const validation = await validateCrystallizationQuality(crystallizedContext);
     expect(validation.score).toBeGreaterThan(80);
     expect(validation.aiReadability).toBeGreaterThan(85);
   });
@@ -217,7 +236,7 @@ describe('AI Context Generation', () => {
 
 ```typescript
 // Good: AI-focused interface design
-interface AIContextRequest {
+interface AICrystallizationRequest {
   query: string;
   maxTokens: number;
   category?: ContextCategory;
@@ -235,15 +254,15 @@ interface CrystallizedContext {
 }
 ```
 
-### AI Context Engineering Standards
+### AI Crystallization Engineering Standards
 
-1. **Context Templates**
+1. **Crystallized Context Templates**
    - Short template: ≤200 tokens (config, types, constants)
    - Extended template: ≤2000 tokens (services, controllers, complex logic)
 
 2. **Quality Metrics**
    - Completeness: >80% for core files
-   - AI Readability: >85% for all contexts
+   - AI Readability: >85% for all crystallized contexts
    - Token Efficiency: 5:1 compression ratio target
 
 3. **Search Relevance**
@@ -273,7 +292,7 @@ interface CrystallizedContext {
 2. **Validate AI Focus**
    - Does this improve AI agent workflows?
    - Is it optimized for LLM consumption?
-   - Does it maintain or improve context quality?
+   - Does it maintain or improve crystallized context quality?
 
 3. **Check Performance**
    - Test with large repositories (1000+ files)
@@ -285,7 +304,7 @@ interface CrystallizedContext {
 Your PR should include:
 
 - **Clear description** of changes and AI workflow impact
-- **Test results** showing improved AI context quality
+- **Test results** showing improved AI crystallized context quality
 - **Performance metrics** for large repositories
 - **Integration examples** showing AI agent usage
 - **Breaking changes** clearly documented
@@ -296,7 +315,7 @@ Your PR should include:
    - TypeScript compilation
    - Test suite passes
    - Linting compliance
-   - AI context quality validation
+   - AI crystallization quality validation
 
 2. **Manual Review**
    - Code quality and architecture
@@ -319,10 +338,10 @@ Your PR should include:
 
 ### AI Community Focus
 
-We're building a community focused on **AI context engineering**:
+We're building a community focused on **AI crystallization engineering**:
 
 - Share AI integration patterns
-- Discuss context optimization strategies
+- Discuss crystallization optimization strategies
 - Collaborate on AI workflow improvements
 - Contribute to AI-focused testing
 
@@ -378,4 +397,4 @@ node --inspect dist/index.js
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/context-crystallizer/discussions)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/context-crystallizer/issues)
 
-Thank you for contributing to Context Crystallizer and helping improve AI context engineering for large codebases! 🚀
+Thank you for contributing to Context Crystallizer and helping improve AI crystallization engineering for large repositories! 🚀

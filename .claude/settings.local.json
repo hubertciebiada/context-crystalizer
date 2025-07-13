@@ -28,7 +28,12 @@
       "Bash(gh release create:*)",
       "Bash(npm install:*)",
       "Bash(grep:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(npm view:*)",
+      "mcp__context-crystallizer__init_crystallization",
+      "mcp__context-crystallizer__get_next_file",
+      "mcp__context-crystallizer__store_ai_context",
+      "mcp__context-crystallizer__get_context_status"
     ],
     "deny": []
   }

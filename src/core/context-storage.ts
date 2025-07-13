@@ -247,7 +247,7 @@ export class ContextStorage {
       
       // Build index content
       const lines = [
-        '# AI Context Index',
+        '# Crystallized Context Index',
         '',
         '## Overview',
         'This index provides an AI-optimized overview of all crystallized contexts in this repository.',

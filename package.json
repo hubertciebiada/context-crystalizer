@@ -1,7 +1,7 @@
 {
   "name": "context-crystallizer",
   "version": "1.0.0",
-  "description": "AI Context Engineering for Large Codebases - Transform massive repositories into crystallized, AI-consumable context through systematic analysis and optimization",
+  "description": "AI Crystallization Engineering for Large Repositories - Transform massive repositories into crystallized, AI-consumable knowledge through systematic analysis and optimization. Crystallization extracts meaningful context from any readable files.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,17 +22,17 @@
   "keywords": [
     "mcp",
     "ai",
-    "context-engineering",
+    "crystallization-engineering",
     "llm",
-    "codebase-analysis",
+    "repository-analysis",
     "ai-agents",
     "claude",
     "anthropic",
-    "code-understanding",
+    "knowledge-extraction",
     "context-crystallization",
     "semantic-search",
     "token-optimization",
-    "enterprise-code",
+    "enterprise-repositories",
     "ai-workflows"
   ],
   "author": {

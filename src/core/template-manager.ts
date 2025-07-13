@@ -10,7 +10,7 @@ export class TemplateManager {
   }
 
   private initializeTemplates(): void {
-    // Short template for quick context (max 200 tokens)
+    // Short template for quick crystallized context (max 200 tokens)
     this.templates.set('short', {
       name: 'short',
       maxTokens: 200,
@@ -22,7 +22,7 @@ export class TemplateManager {
       ],
     });
 
-    // Extended template for detailed context (max 2000 tokens)
+    // Extended template for detailed crystallized context (max 2000 tokens)
     this.templates.set('extended', {
       name: 'extended',
       maxTokens: 2000,
@@ -49,11 +49,11 @@ export class TemplateManager {
     const lines: string[] = [];
 
     // Header
-    lines.push(`# AI Context: ${context.relativePath}`);
+    lines.push(`# Crystallized Context: ${context.relativePath}`);
     lines.push('');
 
     // Metadata
-    lines.push('<!-- AI Context Metadata -->');
+    lines.push('<!-- Crystallized Context Metadata -->');
     lines.push(`<!-- Template: ${context.template} -->`);
     lines.push(`<!-- Category: ${context.category} -->`);
     lines.push(`<!-- Complexity: ${context.complexity} -->`);

@@ -18,6 +18,7 @@ const server = new Server(
   {
     name: 'context-crystallizer',
     version: '0.1.0',
+    description: 'Transform large repositories into crystallized, AI-consumable knowledge. Crystallization systematically analyzes each file to extract purpose, APIs, patterns, and relationships.',
   },
   {
     capabilities: {
@@ -38,7 +39,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: 'init_crystallization',
-      description: 'Initialize AI context generation for a repository',
+      description: 'Initialize crystallization process for a repository. Crystallization transforms raw files into AI-optimized, searchable knowledge by systematically analyzing each file to extract its purpose, key concepts, and relationships.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -57,16 +58,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'get_next_file',
-      description: 'Get the next file for AI context generation',
+      name: 'get_next_file_to_crystallize',
+      description: 'Get the next file from the repository for crystallization into AI-consumable context. Returns file content and metadata for AI analysis.',
       inputSchema: {
         type: 'object',
         properties: {},
       },
     },
     {
-      name: 'store_ai_context',
-      description: 'Store AI-generated context for a file with enhanced metadata',
+      name: 'store_crystallized_context',
+      description: 'Store the crystallized context (AI-optimized knowledge) extracted from a file. This preserves the AI\'s analysis for future search and retrieval.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -143,16 +144,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'get_context_status',
-      description: 'Get enhanced context generation progress with AI metrics',
+      name: 'get_crystallization_progress',
+      description: 'Get the current progress of the crystallization process, including files processed, remaining files, and overall completion status.',
       inputSchema: {
         type: 'object',
         properties: {},
       },
     },
     {
-      name: 'search_context',
-      description: 'Search for relevant AI contexts by functionality or purpose',
+      name: 'search_crystallized_contexts',
+      description: 'Search through crystallized contexts to find relevant knowledge by functionality or purpose. Returns ranked results optimized for AI token limits.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -175,8 +176,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'get_context_bundle',
-      description: 'Assemble multiple contexts within token limits for AI analysis',
+      name: 'get_crystallized_bundle',
+      description: 'Assemble multiple crystallized contexts into a token-aware bundle for comprehensive understanding of related files.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -195,8 +196,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'find_related_contexts',
-      description: 'Find contexts related to a specific file for AI exploration',
+      name: 'find_related_crystallized_contexts',
+      description: 'Find crystallized contexts related to a specific file to explore code relationships and dependencies.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -215,7 +216,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'search_by_complexity',
-      description: 'Find contexts by complexity level for AI learning or analysis',
+      description: 'Search crystallized contexts filtered by complexity level for progressive learning and understanding.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -234,8 +235,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'validate_context_quality',
-      description: 'Validate and assess the quality of generated AI contexts',
+      name: 'validate_crystallization_quality',
+      description: 'Validate the quality of crystallized context and get improvement suggestions for better AI comprehension.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -252,8 +253,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'update_context',
-      description: 'Update AI contexts for changed files and maintain freshness',
+      name: 'update_crystallized_contexts',
+      description: 'Update crystallized contexts for files that have changed since last crystallization, maintaining knowledge freshness.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -317,19 +318,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: 'text',
-            text: `✓ Queued ${files.length} relevant files for AI context generation`,
+            text: `✓ Queued ${files.length} relevant files for crystallization`,
           },
         ],
       };
     }
 
-    case 'get_next_file': {
+    case 'get_next_file_to_crystallize': {
       if (!queueManager) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized. Run init_crystallization first.',
+              text: 'Error: Repository not crystallized. Run init_crystallization first.',
             },
           ],
         };
@@ -341,7 +342,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: 'text',
-              text: 'No more files to process. Context generation complete!',
+              text: 'No more files to crystallize. Crystallization process complete!',
             },
           ],
         };
@@ -371,7 +372,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'store_ai_context': {
+    case 'store_crystallized_context': {
       const { filePath, context, fileContent, fileMetadata } = args as {
         filePath: string;
         context: any;
@@ -384,7 +385,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -399,19 +400,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: 'text',
-            text: `✓ Context stored for ${filePath}\n📊 Progress: ${stats.totalContexts} contexts, ${stats.totalTokens} total tokens`,
+            text: `✓ Crystallized context stored for ${filePath}\n📊 Progress: ${stats.totalContexts} crystallized contexts, ${stats.totalTokens} total tokens`,
           },
         ],
       };
     }
 
-    case 'get_context_status': {
+    case 'get_crystallization_progress': {
       if (!queueManager || !contextStorage) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -439,13 +440,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'search_context': {
+    case 'search_crystallized_contexts': {
       if (!contextSearch) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -483,13 +484,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'get_context_bundle': {
+    case 'get_crystallized_bundle': {
       if (!contextSearch) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -527,13 +528,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'find_related_contexts': {
+    case 'find_related_crystallized_contexts': {
       if (!contextSearch) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -573,7 +574,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -606,13 +607,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
 
-    case 'validate_context_quality': {
+    case 'validate_crystallization_quality': {
       if (!contextValidator) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -677,13 +678,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
 
-    case 'update_context': {
+    case 'update_crystallized_contexts': {
       if (!contextUpdater) {
         return {
           content: [
             {
               type: 'text',
-              text: 'Error: Repository not initialized.',
+              text: 'Error: Repository not crystallized.',
             },
           ],
         };
@@ -758,7 +759,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('Context Crystallizer MCP server running...');
+  console.error('Context Crystallizer MCP server running... Ready to transform repositories into crystallized knowledge!');
 }
 
 main().catch((error) => {

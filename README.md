@@ -1,127 +1,58 @@
 # Context Crystallizer 💎
 
-**AI Context Engineering for Large Codebases**
+**AI Context Engineering for Large Repositories**
 
-Transform massive repositories into crystallized, AI-consumable context through systematic analysis and optimization. Enable AI agents to work effectively with enterprise-scale projects by providing token-efficient, LLM-optimized context.
+Transform massive repositories into crystallized, AI-consumable knowledge through systematic analysis and optimization.
+
+## What is Crystallization?
+
+Just as pressure transforms carbon into diamonds, Context Crystallizer applies systematic AI analysis to transform raw repositories into **crystallized knowledge** - structured, searchable, and optimized for AI consumption. Each file is analyzed to extract its purpose, key APIs, patterns, and relationships, creating a knowledge base that AI can efficiently search and understand.
+
+## Inspiration
+
+Context Crystallizer was inspired by [AI Distiller (aid)](https://github.com/janreges/ai-distiller), which pioneered the concept of intelligently extracting essential information from large codebases for AI consumption. While AI Distiller focuses on extracting public APIs and type information using tree-sitter parsers, Context Crystallizer takes a complementary approach by having AI agents generate comprehensive crystallized contexts about functionality, patterns, and relationships.
 
 ## The Problem 🔥
 
-AI agents hit context length limits when working with large codebases. A typical enterprise repository has 10,000+ files, but LLMs can only process a fraction at once. This forces AI to work blindly or make assumptions about unfamiliar code.
+AI agents hit context length limits when working with large repositories. A typical enterprise repository has 10,000+ files, but LLMs can only process a fraction at once. This forces AI to work blindly or make assumptions about unfamiliar code.
 
 ## The Solution ✨
 
-Context Crystallizer creates a **searchable knowledge base** of AI-optimized context:
+Context Crystallizer creates a **searchable crystallized context base** of AI-optimized knowledge:
 
-- 🔍 **AI agents search by functionality**: "find authentication middleware" 
-- ⚡ **Token-efficient context**: 5:1 compression ratio (source:context)
-- 🤖 **LLM-optimized format**: Structured specifically for AI consumption
-- 🪞 **Mirrored navigation**: Preserves codebase spatial relationships
+- 🔍 **Search by functionality**: "find authentication middleware" 
+- ⚡ **Token-efficient**: 5:1 compression ratio (source:crystallized context)
+- 🤖 **AI-optimized format**: Structured specifically for LLM consumption
 - 📊 **Smart assembly**: Combines multiple contexts within token limits
+- 💎 **Crystallized knowledge**: Preserves essential information in optimized form
+
+## How It Works
+
+**Simple 3-step crystallization process:**
+
+1. **Initialize**: Scan repository and prepare for crystallization
+2. **Crystallize**: AI analyzes each file to extract meaningful knowledge  
+3. **Search**: Find relevant crystallized contexts for any task
 
 ## Quick Demo
 
-```bash
-# Install globally
-npm install -g context-crystallizer
+**Developer using Claude Code with a large documentation repository:**
 
-# AI agent workflow
-AI → init_crystallization("/path/to/enterprise-repo")
-Server → "✓ Queued 247 relevant files for analysis"
-
-AI → get_next_file() 
-Server → Returns file content + metadata
-AI → Analyzes and generates compressed context
-AI → store_ai_context(file_path, optimized_context)
-
-# Later: AI needs authentication context
-AI → search_context("JWT authentication middleware", max_tokens=4000)
-Server → Returns ranked, token-optimized context bundle
-AI → Uses context to implement features following existing patterns
-```
-
-## Architecture
-
-```
-┌─────────────────────────────────────┐
-│            AI Agent                 │
-│    "I need auth context"            │
-└─────────────┬───────────────────────┘
-              │ MCP Tools
-┌─────────────┴───────────────────────┐
-│      Context Crystallizer          │
-│   • File scanning & queueing       │
-│   • AI context optimization        │
-│   • Semantic search engine         │
-│   • Token-aware assembly           │
-└─────────────┬───────────────────────┘
-              │
-┌─────────────┴───────────────────────┐
-│    Crystallized Knowledge Base      │
-│                                     │
-│  .context-crystalizer/              │
-│  ├── ai-index.md                    │
-│  ├── context/                       │
-│  │   └── src/auth/                  │
-│  │       └── middleware.py.context.md │
-│  └── ai-metadata/                   │
-└─────────────────────────────────────┘
-```
-
-## AI Context Structure
-
-### AI-Optimized Context Example
-```markdown
-# AI Context: src/auth/middleware.py
-
-## Purpose
-JWT authentication middleware for API requests
-
-## Key APIs for AI
-- authenticate_user(request) → validates JWT tokens
-- refresh_session(user_id) → updates Redis session cache  
-- handle_auth_failure(error) → standardized error responses
-
-## Context Dependencies  
-- jwt: token operations
-- redis: session storage
-- user_service: validation
-- config.security: JWT secrets
-
-## AI Implementation Patterns
-- Error handling: Returns 401/403 responses
-- Performance: 5min cache for validations
-- Security: Rate limiting (100 req/min per IP)
-- Integration: Used by all /api/protected/* routes
-
-## Related Contexts
-- [auth/models.py](./models.py.context.md) - User data models
-- [api/routes.py](../api/routes.py.context.md) - Protected endpoints
-```
-
-## MCP Tools for AI Agents
-
-10 specialized tools for systematic codebase analysis:
-
-| Tool | Purpose | AI Usage |
-|------|---------|----------|
-| `init_crystallization(repo_path)` | Prepare codebase | Initialize large repo analysis |
-| `get_next_file()` | Serve files systematically | Generate context progressively |
-| `store_ai_context(file, context)` | Save optimized context | Store AI-generated analysis |
-| `search_context(query, max_tokens)` | Find relevant context | Retrieve context for tasks |
-| `get_context_bundle(files, max_tokens)` | Assemble multi-file context | Understand complex workflows |
-| `find_related_contexts(file)` | Discover relationships | Explore code connections |
-| `validate_context_quality(file)` | Check context quality | Ensure AI-consumable output |
-| `update_context()` | Refresh stale contexts | Maintain accuracy over time |
-| `search_by_complexity(level)` | Find by difficulty | Learn patterns systematically |
-| `get_context_status()` | Monitor progress | Track analysis completion |
-
-## Performance Metrics
-
-- **Token Efficiency**: 5:1 compression (source code → AI context)
-- **Search Speed**: <100ms for semantic queries
-- **Context Coverage**: >95% of public APIs documented
-- **Relevance**: >90% accuracy for functional searches
-- **Scale**: Handles 10,000+ file repositories
+> **Developer**: "I need to understand how authentication works in this massive project"
+>
+> **Claude**: "I'll crystallize this repository first to build a searchable knowledge base, then find all authentication-related information."
+>
+> *Claude crystallizes the repository - scanning and analyzing each file*
+>
+> **Claude**: "Crystallization complete! I found 5 files with authentication logic. The main JWT middleware handles token validation with Redis session caching. Here's how it works..."
+>
+> *Claude provides comprehensive explanation using crystallized contexts*
+>
+> **Developer**: "What files depend on the authentication system?"
+>
+> **Claude**: "Let me search for related crystallized contexts..."
+>
+> *Claude uses find_related_crystallized_contexts() to discover dependencies*
 
 ## Installation & Setup
 
@@ -154,72 +85,90 @@ Add to your Claude Desktop configuration (`~/claude_desktop_config.json`):
 }
 ```
 
-### First Analysis
+### First Crystallization
 
 ```typescript
-// 1. Initialize repository
+// 1. Initialize crystallization
 await callTool("init_crystallization", {
   repoPath: "/workspace/my-project"
 });
 
-// 2. Get first file for analysis
-const file = await callTool("get_next_file", {});
+// 2. Get first file for crystallization
+const file = await callTool("get_next_file_to_crystallize", {});
 
-// 3. Generate AI context (use your AI model)
-const context = {
+// 3. Generate crystallized context (use your AI model)
+const crystallizedContext = {
   purpose: "Main application entry point that configures Express server",
   keyAPIs: ["app.listen", "configureRoutes", "setupMiddleware"],
   dependencies: ["express", "./routes", "./middleware"],
   patterns: ["Express.js framework", "Middleware pattern"]
 };
 
-// 4. Store the optimized context
-await callTool("store_ai_context", {
+// 4. Store the crystallized context
+await callTool("store_crystallized_context", {
   filePath: file.relativePath,
-  context,
+  context: crystallizedContext,
   fileContent: file.content,
   fileMetadata: file.metadata
 });
 
 // 5. Search for functionality
-const authResults = await callTool("search_context", {
+const authResults = await callTool("search_crystallized_contexts", {
   query: "authentication middleware",
   maxTokens: 4000
 });
 ```
+
+## MCP Tools for AI Agents
+
+**Crystallization Setup & Processing**
+- `init_crystallization(repo_path)` - Initialize crystallization process
+- `get_next_file_to_crystallize()` - Get next file for AI analysis
+- `store_crystallized_context(file, context)` - Save AI-generated knowledge
+- `get_crystallization_progress()` - Monitor crystallization progress
+
+**Using Crystallized Knowledge**
+- `search_crystallized_contexts(query, max_tokens)` - Find relevant knowledge by functionality
+- `get_crystallized_bundle(files, max_tokens)` - Combine multiple contexts for complex understanding
+- `find_related_crystallized_contexts(file)` - Discover code relationships
+
+**Maintaining Crystallized Knowledge**
+- `validate_crystallization_quality(file)` - Assess context quality and get improvement suggestions
+- `update_crystallized_contexts()` - Refresh contexts for changed files
+- `search_by_complexity(level)` - Find contexts by difficulty for progressive learning
 
 ## Common Use Cases
 
 ### 🔧 **Feature Implementation**
 AI agent needs to add OAuth login to existing auth system
 ```typescript
-const authContext = await callTool("search_context", {
+const authContexts = await callTool("search_crystallized_contexts", {
   query: "authentication login OAuth middleware",
   maxTokens: 3000
 });
-// Returns relevant auth context within token limits
+// Returns relevant crystallized contexts within token limits
 // AI implements OAuth following existing patterns
 ```
 
 ### 🔍 **Code Review** 
 AI reviewing changes to payment processing
 ```typescript
-const paymentBundle = await callTool("get_context_bundle", {
+const paymentBundle = await callTool("get_crystallized_bundle", {
   files: ["src/payments/", "src/api/billing/"],
   maxTokens: 5000
 });
-// Returns comprehensive payment system context
+// Returns comprehensive payment system crystallized contexts
 // AI reviews for security, patterns, integration issues
 ```
 
 ### 📚 **Documentation Generation**
 AI creating API documentation
 ```typescript
-const apiContext = await callTool("search_context", {
+const apiContexts = await callTool("search_crystallized_contexts", {
   query: "public API endpoints controllers",
   maxTokens: 8000
 });
-// Returns all public API context
+// Returns all public API crystallized contexts
 // AI generates comprehensive, accurate documentation
 ```
 
@@ -227,26 +176,24 @@ const apiContext = await callTool("search_context", {
 AI helping debug authentication issues
 ```typescript
 const authFile = "src/middleware/auth.ts";
-const relatedContexts = await callTool("find_related_contexts", {
+const relatedContexts = await callTool("find_related_crystallized_contexts", {
   filePath: authFile,
   maxResults: 5
 });
 // Discovers related auth components for comprehensive debugging
 ```
 
-### 🔄 **Refactoring Support**
-AI analyzing complex files for improvement opportunities
-```typescript
-const complexFiles = await callTool("search_by_complexity", {
-  complexity: "high",
-  maxResults: 10
-});
-// Identifies candidates for refactoring based on complexity
-```
+## Performance Metrics
+
+- **Token Efficiency**: 5:1 compression (source code → crystallized context)
+- **Search Speed**: <100ms for semantic queries
+- **Context Coverage**: >95% of public APIs documented
+- **Relevance**: >90% accuracy for functional searches
+- **Scale**: Handles 10,000+ file repositories
 
 ## Why "Crystallizer"? 
 
-Like applying **pressure** to carbon creates diamonds, Context Crystallizer applies **systematic analysis** to code, producing **crystallized knowledge** that:
+Like applying **pressure** to carbon creates diamonds, Context Crystallizer applies **systematic analysis** to repositories, producing **crystallized knowledge** that:
 
 - ✨ **Preserves essential structure** while removing noise
 - 💎 **Becomes more valuable** than the raw material  
@@ -255,16 +202,16 @@ Like applying **pressure** to carbon creates diamonds, Context Crystallizer appl
 
 ## Advanced Features
 
-### Context Quality Validation
+### Crystallization Quality Validation
 ```typescript
-// Check context quality with detailed metrics
-const validation = await callTool("validate_context_quality", {
+// Check crystallization quality with detailed metrics
+const validation = await callTool("validate_crystallization_quality", {
   filePath: "src/services/UserService.ts"
 });
 // Returns completeness, accuracy, and AI-readability scores
 
 // Generate project-wide quality report
-const qualityReport = await callTool("validate_context_quality", {
+const qualityReport = await callTool("validate_crystallization_quality", {
   generateReport: true
 });
 // Comprehensive analysis with recommendations
@@ -273,12 +220,12 @@ const qualityReport = await callTool("validate_context_quality", {
 ### Incremental Updates
 ```typescript
 // Detect and update only changed files
-const updateResult = await callTool("update_context", {
+const updateResult = await callTool("update_crystallized_contexts", {
   forceUpdate: false,        // Only update changed files
   includeUnchanged: false,   // Skip files without context
   cleanupDeleted: true       // Remove obsolete contexts
 });
-// Maintains context freshness efficiently
+// Maintains crystallized context freshness efficiently
 ```
 
 ### Token Optimization Strategies
@@ -290,15 +237,15 @@ const updateResult = await callTool("update_context", {
 ## Troubleshooting
 
 ### Common Issues
-- **"Repository not initialized"**: Run `init_crystallization` first
-- **Empty search results**: Ensure contexts are generated for your files
+- **"Repository not crystallized"**: Run `init_crystallization` first
+- **Empty search results**: Ensure crystallized contexts are generated for your files
 - **Token limit exceeded**: Reduce `maxTokens` parameter in queries
-- **Stale contexts**: Use `update_context` to refresh outdated information
+- **Stale contexts**: Use `update_crystallized_contexts` to refresh outdated information
 
 ### Performance Tips
 - Process files in batches for large repositories
 - Use category filters to narrow searches
-- Cache frequently accessed contexts
+- Cache frequently accessed crystallized contexts
 - Update incrementally using change detection
 
 ## Contributing
@@ -307,8 +254,10 @@ We welcome contributions! Focus on AI workflow improvements:
 
 - 🐛 **Bug Reports**: Use our issue templates
 - 💡 **Feature Requests**: Enhance AI context engineering capabilities  
-- 🔧 **Pull Requests**: Include AI context validation tests
+- 🔧 **Pull Requests**: Include crystallization quality validation tests
 - 💬 **Discussions**: Share AI integration patterns
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 
@@ -316,6 +265,6 @@ MIT License - see [LICENSE.md](LICENSE.md) for details.
 
 ---
 
-**Transform your large codebase into AI-consumable knowledge. Enable AI agents to work with enterprise-scale projects efficiently.**
+**Transform your large repository into crystallized, AI-consumable knowledge. Enable AI agents to work with enterprise-scale projects efficiently.**
 
 ⭐ **Star this repo** if Context Crystallizer helps your AI workflows!
