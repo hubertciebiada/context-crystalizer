@@ -50,6 +50,8 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
     "glob": "^11.0.0",
     "ignore": "^6.0.2",
     "minimatch": "^10.0.1",

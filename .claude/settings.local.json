@@ -34,7 +34,10 @@
       "mcp__context-crystallizer__get_next_file",
       "mcp__context-crystallizer__store_ai_context",
       "mcp__context-crystallizer__get_context_status",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(node:*)",
+      "Bash(timeout:*)"
     ],
     "deny": []
   }
