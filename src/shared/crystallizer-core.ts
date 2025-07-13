@@ -57,6 +57,9 @@ export class CrystallizerCore {
     // Create template files for user customization
     await this.createTemplateFiles(repoPath);
 
+    // Create timeout configuration file for concurrent agent support
+    await this.createTimeoutConfigFile(repoPath);
+
     return { filesQueued: files.length };
   }
 
@@ -151,6 +154,19 @@ Focus on comprehensive understanding for complex files.`;
     }
     
     await fs.writeFile(destPath, content);
+  }
+
+  private async createTimeoutConfigFile(repoPath: string): Promise<void> {
+    const timeoutConfigPath = path.join(repoPath, '.context-crystalizer', 'crystallization_timeout.txt');
+    
+    // Only create if it doesn't exist (don't overwrite user customizations)
+    try {
+      await fs.access(timeoutConfigPath);
+      // File exists, skip
+    } catch {
+      // File doesn't exist, create it with default 15 minutes (900 seconds)
+      await fs.writeFile(timeoutConfigPath, '900');
+    }
   }
 
   async getNextFileForCrystallization() {

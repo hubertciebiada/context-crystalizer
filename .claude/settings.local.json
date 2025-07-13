@@ -44,7 +44,9 @@
       "Bash(gh workflow:*)",
       "Bash(git tag:*)",
       "Bash(gh release list:*)",
-      "Bash(gh release:*)"
+      "Bash(gh release:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ],
     "deny": []
   }

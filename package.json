@@ -55,6 +55,7 @@
     "glob": "^11.0.0",
     "ignore": "^6.0.2",
     "minimatch": "^10.0.1",
+    "p-limit": "^6.2.0",
     "p-queue": "^8.0.1",
     "picomatch": "^4.0.2"
   },

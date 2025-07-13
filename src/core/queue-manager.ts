@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import pLimit from 'p-limit';
 import { FileQueueItem, CrystallizationProgress, QueueState } from '../types/index.js';
 
 export class QueueManager {
@@ -12,6 +13,11 @@ export class QueueManager {
   private repoPath: string | null = null;
   private queueStatePath: string | null = null;
   private excludePatterns: string[] = [];
+  
+  // Concurrent agent support
+  private claimLimit = pLimit(1); // Mutex: only 1 agent can claim at a time
+  private claimsPath: string | null = null;
+  private timeoutSeconds: number = 900; // 15 minutes default
 
   constructor() {
     this.sessionId = crypto.randomUUID();
@@ -21,6 +27,10 @@ export class QueueManager {
     this.repoPath = repoPath;
     this.excludePatterns = excludePatterns;
     this.queueStatePath = path.join(repoPath, '.context-crystalizer', 'processing-queue.json');
+    this.claimsPath = path.join(repoPath, '.context-crystalizer', 'file-claims.json');
+    
+    // Load timeout configuration
+    await this.loadTimeoutConfig();
     
     // Try to recover from existing session
     const recovered = await this.tryRecoverSession(repoPath, excludePatterns);
@@ -34,19 +44,25 @@ export class QueueManager {
   }
 
   async getNextFile(): Promise<FileQueueItem | null> {
-    while (this.queue.length > 0) {
-      const file = this.queue.shift()!;
+    // Critical section: only one agent can claim files at a time
+    return this.claimLimit(async () => {
+      await this.cleanupExpiredClaims();
       
-      if (!this.processed.has(file.path)) {
-        this.currentFile = file.path;
-        await this.saveQueueState();
-        return file;
+      while (this.queue.length > 0) {
+        const file = this.queue.shift()!;
+        
+        if (!this.processed.has(file.path) && !await this.isFileClaimed(file.path)) {
+          await this.claimFile(file.path);
+          this.currentFile = file.path;
+          await this.saveQueueState();
+          return file;
+        }
       }
-    }
-    
-    this.currentFile = null;
-    await this.saveQueueState();
-    return null;
+      
+      this.currentFile = null;
+      await this.saveQueueState();
+      return null;
+    });
   }
 
   async markProcessed(filePath: string): Promise<void> {
@@ -55,6 +71,9 @@ export class QueueManager {
     if (this.currentFile === filePath) {
       this.currentFile = null;
     }
+    
+    // Release the claim when processing is complete
+    await this.releaseClaim(filePath);
     
     await this.saveQueueState();
   }
@@ -201,5 +220,100 @@ export class QueueManager {
       startTime: this.startTime,
       repoPath: this.repoPath,
     };
+  }
+
+  // Claim management methods for concurrent agent support
+
+  private async loadTimeoutConfig(): Promise<void> {
+    if (!this.repoPath) return;
+    
+    const timeoutConfigPath = path.join(this.repoPath, '.context-crystalizer', 'crystallization_timeout.txt');
+    
+    try {
+      const content = await fs.readFile(timeoutConfigPath, 'utf-8');
+      const timeout = parseInt(content.trim());
+      if (!isNaN(timeout) && timeout > 0) {
+        this.timeoutSeconds = timeout;
+      }
+    } catch (_error) {
+      // Use default timeout if file doesn't exist or is invalid
+      this.timeoutSeconds = 900; // 15 minutes
+    }
+  }
+
+  private async loadClaims(): Promise<Record<string, number>> {
+    if (!this.claimsPath) return {};
+    
+    try {
+      const content = await fs.readFile(this.claimsPath, 'utf-8');
+      return JSON.parse(content);
+    } catch (_error) {
+      // Return empty claims if file doesn't exist or is invalid
+      return {};
+    }
+  }
+
+  private async saveClaims(claims: Record<string, number>): Promise<void> {
+    if (!this.claimsPath) return;
+    
+    try {
+      await fs.writeFile(this.claimsPath, JSON.stringify(claims, null, 2), 'utf-8');
+    } catch (_error) {
+      console.error('Failed to save claims:', _error);
+    }
+  }
+
+  private async claimFile(filePath: string): Promise<void> {
+    const claims = await this.loadClaims();
+    claims[filePath] = Date.now();
+    await this.saveClaims(claims);
+  }
+
+  private async releaseClaim(filePath: string): Promise<void> {
+    const claims = await this.loadClaims();
+    delete claims[filePath];
+    await this.saveClaims(claims);
+  }
+
+  private async isFileClaimed(filePath: string): Promise<boolean> {
+    const claims = await this.loadClaims();
+    const claimTime = claims[filePath];
+    
+    if (!claimTime) return false;
+    
+    const now = Date.now();
+    const timeoutMs = this.timeoutSeconds * 1000;
+    
+    // Check if claim has expired
+    if (now - claimTime > timeoutMs) {
+      // Claim expired, remove it
+      delete claims[filePath];
+      await this.saveClaims(claims);
+      return false;
+    }
+    
+    return true;
+  }
+
+  private async cleanupExpiredClaims(): Promise<void> {
+    const claims = await this.loadClaims();
+    const now = Date.now();
+    const timeoutMs = this.timeoutSeconds * 1000;
+    
+    const activeClaims: Record<string, number> = {};
+    let hasExpiredClaims = false;
+    
+    for (const [filePath, claimTime] of Object.entries(claims)) {
+      if (now - claimTime < timeoutMs) {
+        activeClaims[filePath] = claimTime;
+      } else {
+        hasExpiredClaims = true;
+      }
+    }
+    
+    // Only save if we found expired claims to clean up
+    if (hasExpiredClaims) {
+      await this.saveClaims(activeClaims);
+    }
   }
 }
