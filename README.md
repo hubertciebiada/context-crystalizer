@@ -58,7 +58,7 @@ AI → Uses context to implement features following existing patterns
 ┌─────────────┴───────────────────────┐
 │    Crystallized Knowledge Base      │
 │                                     │
-│  .context-crystal/                  │
+│  .context-crystalizer/              │
 │  ├── ai-index.md                    │
 │  ├── context/                       │
 │  │   └── src/auth/                  │

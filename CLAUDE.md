@@ -52,7 +52,7 @@ context-crystalizer/
 ├── README.md              # Primary project documentation
 ├── .claude/               # Claude Code configuration
 ├── .taskmaster/           # Task management configuration
-└── .context-crystal/      # (Future) Crystallized knowledge base
+└── .context-crystalizer/  # (Future) Crystallized knowledge base
     ├── ai-index.md
     ├── context/
     └── ai-metadata/

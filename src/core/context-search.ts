@@ -9,7 +9,7 @@ export class ContextSearch {
 
   constructor(repoPath: string) {
     this.repoPath = path.resolve(repoPath);
-    this.contextBasePath = path.join(this.repoPath, '.context-crystal');
+    this.contextBasePath = path.join(this.repoPath, '.context-crystalizer');
   }
 
   async searchContexts(query: string, maxTokens: number = 4000, category?: string): Promise<SearchResult[]> {
@@ -321,7 +321,7 @@ export class ContextSearch {
     const tokenMatch = markdown.match(/<!-- Tokens: (\d+) -->/);
     
     const context: CrystallizedContext = {
-      filePath: path.join(this.repoPath, relativePath),
+      filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: '',
       keyAPIs: [],

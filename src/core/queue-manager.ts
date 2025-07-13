@@ -20,7 +20,7 @@ export class QueueManager {
   async initializeQueue(files: FileQueueItem[], repoPath: string, excludePatterns: string[] = []): Promise<void> {
     this.repoPath = repoPath;
     this.excludePatterns = excludePatterns;
-    this.queueStatePath = path.join(repoPath, '.context-crystal', 'processing-queue.json');
+    this.queueStatePath = path.join(repoPath, '.context-crystalizer', 'processing-queue.json');
     
     // Try to recover from existing session
     const recovered = await this.tryRecoverSession(repoPath, excludePatterns);
@@ -119,7 +119,7 @@ export class QueueManager {
 
   async tryRecoverSession(repoPath: string, excludePatterns: string[]): Promise<boolean> {
     try {
-      const queueStatePath = path.join(repoPath, '.context-crystal', 'processing-queue.json');
+      const queueStatePath = path.join(repoPath, '.context-crystalizer', 'processing-queue.json');
       const stateContent = await fs.readFile(queueStatePath, 'utf-8');
       const state: QueueState = JSON.parse(stateContent);
       

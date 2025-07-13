@@ -13,7 +13,7 @@ export class ContextStorage {
 
   constructor(repoPath: string) {
     this.repoPath = path.resolve(repoPath);
-    this.contextBasePath = path.join(this.repoPath, '.context-crystal');
+    this.contextBasePath = path.join(this.repoPath, '.context-crystalizer');
     this.templateManager = new TemplateManager();
   }
 
@@ -30,8 +30,12 @@ export class ContextStorage {
     fileContent?: string,
     fileMetadata?: { complexity: 'low' | 'medium' | 'high'; category: 'config' | 'source' | 'test' | 'docs' | 'other'; estimatedTokens: number }
   ): Promise<void> {
-    const relativePath = path.relative(this.repoPath, filePath);
+    // Ensure we always work with relative paths for portability
+    const relativePath = path.isAbsolute(filePath) 
+      ? path.relative(this.repoPath, filePath)
+      : filePath;
     const contextPath = this.getContextPath(relativePath);
+    const absoluteFilePath = path.isAbsolute(filePath) ? filePath : path.join(this.repoPath, filePath);
     
     // Determine template based on complexity and category
     const template = context.template || this.templateManager.determineTemplateForFile(
@@ -43,11 +47,11 @@ export class ContextStorage {
     // Analyze cross-references if file content is provided
     let crossReferences = context.crossReferences || [];
     if (fileContent && this.allFiles.length > 0) {
-      crossReferences = CrossReferenceAnalyzer.analyzeFileReferences(filePath, fileContent, this.allFiles);
+      crossReferences = CrossReferenceAnalyzer.analyzeFileReferences(absoluteFilePath, fileContent, this.allFiles);
     }
     
     const fullContext: CrystallizedContext = {
-      filePath,
+      filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: context.purpose || '',
       keyAPIs: context.keyAPIs || [],
@@ -131,7 +135,7 @@ export class ContextStorage {
     const tokenMatch = markdown.match(/<!-- Tokens: (\d+) -->/);
     
     const context: CrystallizedContext = {
-      filePath: path.join(this.repoPath, relativePath),
+      filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: '',
       keyAPIs: [],
