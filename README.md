@@ -85,168 +85,147 @@ Add to your Claude Desktop configuration (`~/claude_desktop_config.json`):
 }
 ```
 
-### First Crystallization
+## MCP Tools for AI Agents & Developers
 
-```typescript
-// 1. Initialize crystallization
-await callTool("init_crystallization", {
-  repoPath: "/workspace/my-project"
-});
+Context Crystallizer provides 11 specialized MCP tools that work seamlessly with AI agents (like Claude) and can also be accessed by developers through the command line interface.
 
-// 2. Get first file for crystallization
-const file = await callTool("get_next_file_to_crystallize", {});
+### For AI Agents
+AI agents interact with Context Crystallizer through MCP (Model Context Protocol) when the server is running. The tools enable conversation-driven crystallization and knowledge search.
 
-// 3. Generate crystallized context (use your AI model)
-const crystallizedContext = {
-  purpose: "Main application entry point that configures Express server",
-  keyAPIs: ["app.listen", "configureRoutes", "setupMiddleware"],
-  dependencies: ["express", "./routes", "./middleware"],
-  patterns: ["Express.js framework", "Middleware pattern"]
-};
+### For Developers  
+Developers start the MCP server with `context-crystallizer` and can integrate with Claude Desktop, or use other MCP-compatible clients to access the tools programmatically.
 
-// 4. Store the crystallized context
-await callTool("store_crystallized_context", {
-  filePath: file.relativePath,
-  context: crystallizedContext,
-  fileContent: file.content,
-  fileMetadata: file.metadata
-});
+| Tool | Purpose | Parameters | AI Agent Conversation Example | Developer Notes |
+|------|---------|------------|-------------------------------|-----------------|
+| **init_crystallization** | Initialize repository for crystallization analysis | `repoPath` (required)<br>`exclude` (array, optional) | **Developer**: "Set up this React project for crystallization"<br>**Claude**: "I'll initialize crystallization for your React project"<br>*Claude calls init_crystallization*<br>**Claude**: "✓ Queued 247 files for crystallization. Ready to start analyzing!" | Start with `context-crystallizer` then integrate with Claude Desktop config |
+| **get_next_file_to_crystallize** | Get next file for AI analysis during crystallization | None | **Claude**: "Let me get the next file to analyze..."<br>*Claude calls get_next_file_to_crystallize*<br>**Claude**: "Analyzing src/components/Auth.tsx - this appears to be authentication UI logic..." | Used internally by AI during crystallization process |
+| **store_crystallized_context** | Save AI-generated crystallized knowledge for a file | `filePath` (required)<br>`context` (object, required)<br>`fileContent` (string)<br>`fileMetadata` (object) | **Claude**: "I've analyzed the authentication component. Storing crystallized context..."<br>*Claude calls store_crystallized_context*<br>**Claude**: "✓ Crystallized context stored. Progress: 45/247 files" | AI automatically stores analysis results |
+| **get_crystallization_progress** | Monitor crystallization completion status | None | **Developer**: "How's the crystallization going?"<br>**Claude**: "Let me check progress..."<br>*Claude calls get_crystallization_progress*<br>**Claude**: "Progress: 45/247 files (18% complete), ~2 hours remaining" | Use to track long-running crystallization sessions |
+| **search_crystallized_contexts** | Find relevant knowledge by functionality | `query` (required)<br>`maxTokens` (number, default: 4000)<br>`category` (enum, optional) | **Developer**: "How does authentication work in this app?"<br>**Claude**: "Let me search the crystallized contexts..."<br>*Claude calls search_crystallized_contexts with query="authentication"*<br>**Claude**: "Found 5 auth-related files: JWT middleware, login component, auth context..." | Core search functionality for finding relevant code |
+| **get_crystallized_bundle** | Combine multiple contexts for complex understanding | `files` (array, required)<br>`maxTokens` (number, default: 8000) | **Developer**: "Show me how the payment system works"<br>**Claude**: "I'll bundle all payment-related contexts..."<br>*Claude calls get_crystallized_bundle*<br>**Claude**: "The payment flow involves 4 components: PaymentForm, Stripe integration, order processing, and receipt generation..." | Assembles related files for comprehensive analysis |
+| **find_related_crystallized_contexts** | Discover code relationships and dependencies | `filePath` (required)<br>`maxResults` (number, default: 5) | **Developer**: "What depends on this Auth.tsx file?"<br>**Claude**: "Let me find related contexts..."<br>*Claude calls find_related_crystallized_contexts*<br>**Claude**: "Found 3 related files: LoginPage uses Auth.tsx, ProtectedRoute depends on it, and UserProfile imports its types" | Explore code relationships and impacts |
+| **search_by_complexity** | Find contexts by difficulty level for learning | `complexity` (enum: low/medium/high)<br>`maxResults` (number, default: 10) | **Developer**: "Show me simple files to understand first"<br>**Claude**: "Finding low-complexity files..."<br>*Claude calls search_by_complexity with complexity="low"*<br>**Claude**: "Here are 8 simple config files and utility functions to start with..." | Progressive learning of codebase complexity |
+| **validate_crystallization_quality** | Assess context quality and get improvement suggestions | `filePath` (optional)<br>`generateReport` (boolean, default: false) | **Developer**: "Is the crystallization quality good?"<br>**Claude**: "Let me validate the crystallization quality..."<br>*Claude calls validate_crystallization_quality*<br>**Claude**: "Quality report: 89% completeness, 92% AI readability. Suggestions: Add more error handling patterns for 3 files" | Quality assurance for crystallized knowledge |
+| **update_crystallized_contexts** | Refresh contexts for changed files | `forceUpdate` (boolean)<br>`includeUnchanged` (boolean)<br>`cleanupDeleted` (boolean)<br>`checkOnly` (boolean)<br>`generateReport` (boolean) | **Developer**: "Update crystallization after my changes"<br>**Claude**: "Detecting changed files and updating contexts..."<br>*Claude calls update_crystallized_contexts*<br>**Claude**: "Updated 3 changed files, removed 1 deleted file. Crystallization is current!" | Maintain accuracy after code changes |
 
-// 5. Search for functionality
-const authResults = await callTool("search_crystallized_contexts", {
-  query: "authentication middleware",
-  maxTokens: 4000
-});
+### Usage Patterns
+
+**🔄 Initial Setup & Crystallization**
+```
+Developer → Start: context-crystallizer
+Developer → Configure: Claude Desktop with MCP
+Developer → Request: "Crystallize this repository"
+Claude → Calls: init_crystallization, get_next_file_to_crystallize, store_crystallized_context
+Claude → Reports: Progress and completion
 ```
 
-## MCP Tools for AI Agents
+**🔍 Daily Development Workflow**  
+```
+Developer → Ask: "How does feature X work?"
+Claude → Calls: search_crystallized_contexts
+Claude → Explains: Using found crystallized knowledge
 
-**Crystallization Setup & Processing**
-- `init_crystallization(repo_path)` - Initialize crystallization process
-- `get_next_file_to_crystallize()` - Get next file for AI analysis
-- `store_crystallized_context(file, context)` - Save AI-generated knowledge
-- `get_crystallization_progress()` - Monitor crystallization progress
-
-**Using Crystallized Knowledge**
-- `search_crystallized_contexts(query, max_tokens)` - Find relevant knowledge by functionality
-- `get_crystallized_bundle(files, max_tokens)` - Combine multiple contexts for complex understanding
-- `find_related_crystallized_contexts(file)` - Discover code relationships
-
-**Maintaining Crystallized Knowledge**
-- `validate_crystallization_quality(file)` - Assess context quality and get improvement suggestions
-- `update_crystallized_contexts()` - Refresh contexts for changed files
-- `search_by_complexity(level)` - Find contexts by difficulty for progressive learning
-
-## Common Use Cases
-
-### 🔧 **Feature Implementation**
-AI agent needs to add OAuth login to existing auth system
-```typescript
-const authContexts = await callTool("search_crystallized_contexts", {
-  query: "authentication login OAuth middleware",
-  maxTokens: 3000
-});
-// Returns relevant crystallized contexts within token limits
-// AI implements OAuth following existing patterns
+Developer → Ask: "What will this change affect?"
+Claude → Calls: find_related_crystallized_contexts  
+Claude → Warns: About potential impacts
 ```
 
-### 🔍 **Code Review** 
-AI reviewing changes to payment processing
-```typescript
-const paymentBundle = await callTool("get_crystallized_bundle", {
-  files: ["src/payments/", "src/api/billing/"],
-  maxTokens: 5000
-});
-// Returns comprehensive payment system crystallized contexts
-// AI reviews for security, patterns, integration issues
+**🔧 Maintenance & Updates**
+```
+Developer → Notification: "I changed some files"
+Claude → Calls: update_crystallized_contexts
+Claude → Reports: "Updated 3 contexts, all current"
+
+Developer → Question: "Is crystallization still good quality?"
+Claude → Calls: validate_crystallization_quality
+Claude → Reports: Quality metrics and suggestions
 ```
 
-### 📚 **Documentation Generation**
-AI creating API documentation
-```typescript
-const apiContexts = await callTool("search_crystallized_contexts", {
-  query: "public API endpoints controllers",
-  maxTokens: 8000
-});
-// Returns all public API crystallized contexts
-// AI generates comprehensive, accurate documentation
+## CLI & Developer Usage
+
+### Starting the MCP Server
+
+```bash
+# Install globally
+npm install -g context-crystallizer
+
+# Navigate to your project directory
+cd /path/to/your/project
+
+# Start the MCP server (required for AI agent integration)
+context-crystallizer
 ```
 
-### 🐛 **Debugging Assistance**
-AI helping debug authentication issues
-```typescript
-const authFile = "src/middleware/auth.ts";
-const relatedContexts = await callTool("find_related_crystallized_contexts", {
-  filePath: authFile,
-  maxResults: 5
-});
-// Discovers related auth components for comprehensive debugging
+The server will start and display:
+```
+Context Crystallizer MCP server running... Ready to transform repositories into crystallized knowledge!
 ```
 
-## Performance Metrics
+### Integration Options
 
-- **Token Efficiency**: 5:1 compression (source code → crystallized context)
-- **Search Speed**: <100ms for semantic queries
-- **Context Coverage**: >95% of public APIs documented
-- **Relevance**: >90% accuracy for functional searches
-- **Scale**: Handles 10,000+ file repositories
+**1. Claude Desktop Integration**
 
-## Why "Crystallizer"? 
-
-Like applying **pressure** to carbon creates diamonds, Context Crystallizer applies **systematic analysis** to repositories, producing **crystallized knowledge** that:
-
-- ✨ **Preserves essential structure** while removing noise
-- 💎 **Becomes more valuable** than the raw material  
-- 🔍 **Enables clear vision** through complex systems
-- ⚡ **Optimizes for AI consumption** with perfect clarity
-
-## Advanced Features
-
-### Crystallization Quality Validation
-```typescript
-// Check crystallization quality with detailed metrics
-const validation = await callTool("validate_crystallization_quality", {
-  filePath: "src/services/UserService.ts"
-});
-// Returns completeness, accuracy, and AI-readability scores
-
-// Generate project-wide quality report
-const qualityReport = await callTool("validate_crystallization_quality", {
-  generateReport: true
-});
-// Comprehensive analysis with recommendations
+Add to `~/claude_desktop_config.json`:
+```json
+{
+  "mcpServers": {
+    "context-crystallizer": {
+      "command": "npx", 
+      "args": ["context-crystallizer"],
+      "cwd": "/path/to/your/project"
+    }
+  }
+}
 ```
 
-### Incremental Updates
-```typescript
-// Detect and update only changed files
-const updateResult = await callTool("update_crystallized_contexts", {
-  forceUpdate: false,        // Only update changed files
-  includeUnchanged: false,   // Skip files without context
-  cleanupDeleted: true       // Remove obsolete contexts
-});
-// Maintains crystallized context freshness efficiently
+**2. MCP-Compatible Clients**
+
+Any MCP-compatible client can connect to the server and use the 11 crystallization tools. The server implements the standard MCP protocol for tool discovery and execution.
+
+**3. Direct Development**
+
+For development and testing:
+```bash
+# Development with hot reload
+npm run dev
+
+# Production build
+npm run build
+npm start
+
+# TypeScript development
+npm run dev:mcp
 ```
 
-### Token Optimization Strategies
-- **Short Template** (≤200 tokens): Config files, types, constants
-- **Extended Template** (≤2000 tokens): Controllers, services, complex logic
-- **Smart Assembly**: Combines multiple contexts within LLM limits
-- **Relevance Scoring**: Prioritizes most relevant contexts for queries
+### Command Line Workflow
 
-## Troubleshooting
+```bash
+# 1. Start in project directory
+cd my-large-repo
+context-crystallizer &
 
-### Common Issues
-- **"Repository not crystallized"**: Run `init_crystallization` first
-- **Empty search results**: Ensure crystallized contexts are generated for your files
-- **Token limit exceeded**: Reduce `maxTokens` parameter in queries
-- **Stale contexts**: Use `update_crystallized_contexts` to refresh outdated information
+# 2. Open Claude Desktop (configured with MCP)
+# 3. Ask Claude to crystallize your repository
+# "Please crystallize this repository for better understanding"
 
-### Performance Tips
-- Process files in batches for large repositories
-- Use category filters to narrow searches
-- Cache frequently accessed crystallized contexts
-- Update incrementally using change detection
+# 4. Claude will use the MCP tools to:
+#    - Initialize crystallization (init_crystallization) 
+#    - Process each file (get_next_file_to_crystallize, store_crystallized_context)
+#    - Build searchable knowledge base
+
+# 5. Use crystallized knowledge
+# "How does authentication work?" 
+# "What files depend on the user model?"
+# "Show me all the API endpoints"
+```
+
+### Developer Notes
+
+- **Server Lifecycle**: The MCP server must be running for AI agent integration
+- **Project Context**: Always start the server from your project root directory  
+- **Persistent Storage**: Crystallized contexts are saved in `.context-crystallizer/` directory
+- **File Watching**: Use `update_crystallized_contexts` tool after making code changes
+- **Quality Monitoring**: Regular quality validation ensures accurate crystallized knowledge
 
 ## Contributing
 
