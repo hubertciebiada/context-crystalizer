@@ -44,7 +44,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           exclude: {
             type: 'array',
             items: { type: 'string' },
-            description: 'Patterns to exclude from crystallization',
+            description: 'Additional patterns to exclude from crystallization. Note: .gitignore patterns are automatically respected, plus defaults: node_modules, .git, dist, build',
             default: ['node_modules', '.git', 'dist', 'build'],
           },
         },

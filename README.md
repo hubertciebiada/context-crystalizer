@@ -31,6 +31,9 @@ Context Crystallizer creates a **searchable crystallized context base** of AI-op
 **Simple 3-step crystallization process:**
 
 1. **Initialize**: Scan repository and prepare for crystallization
+   - Automatically respects `.gitignore` patterns
+   - Skips common build directories (node_modules, dist, build, .git)
+   - Filters out binary files and very large files (>1MB)
 2. **Crystallize**: AI analyzes each file to extract meaningful knowledge  
 3. **Search**: Find relevant crystallized contexts for any task
 
@@ -96,7 +99,7 @@ AI agents interact with Context Crystallizer through MCP (Model Context Protocol
 | Tool | Purpose | AI Agent Conversation Example |
 |------|---------|-------------------------------|
 | **get_crystallization_guidance** | Get comprehensive analysis guidance | **Developer**: "How should I analyze these files?"<br>**Claude**: "Let me get the crystallization guidance..."<br>*Claude calls get_crystallization_guidance*<br>**Claude**: "Here's the complete analysis methodology with templates, quality standards, and AI-specific guidance for creating crystallized contexts." |
-| **init_crystallization** | Initialize repository crystallization | **Developer**: "Set up this React project for crystallization"<br>**Claude**: "I'll initialize crystallization for your React project"<br>*Claude calls init_crystallization*<br>**Claude**: "✓ Queued 247 files for crystallization. Ready to start analyzing!" |
+| **init_crystallization** | Initialize repository crystallization | **Developer**: "Set up this React project for crystallization"<br>**Claude**: "I'll initialize crystallization for your React project"<br>*Claude calls init_crystallization*<br>**Claude**: "✓ Queued 247 files for crystallization (automatically respecting .gitignore). Ready to start analyzing!" |
 | **get_next_file_to_crystallize** | Get next file for AI analysis | **Claude**: "Let me get the next file to analyze..."<br>*Claude calls get_next_file_to_crystallize*<br>**Claude**: "Analyzing src/components/Auth.tsx - this appears to be authentication UI logic..." |
 | **store_crystallized_context** | Save AI-generated knowledge | **Claude**: "I've analyzed the authentication component. Storing crystallized context..."<br>*Claude calls store_crystallized_context*<br>**Claude**: "✓ Crystallized context stored. Progress: 45/247 files" |
 | **get_crystallization_progress** | Monitor crystallization status | **Developer**: "How's the crystallization going?"<br>**Claude**: "Let me check progress..."<br>*Claude calls get_crystallization_progress*<br>**Claude**: "Progress: 45/247 files (18% complete), ~2 hours remaining" |
@@ -114,7 +117,7 @@ Developers can use direct CLI commands for precise control over crystallization 
 | Command | Purpose | Example | Parameters |
 |---------|---------|---------|-----------|
 | **guidance** | Get comprehensive analysis guidance | `context-crystallizer guidance` | `--repo-path <path>` (optional) |
-| **init** | Initialize repository crystallization | `context-crystallizer init ./my-repo` | `<repo-path>` (required)<br>`--exclude <patterns...>` (optional) |
+| **init** | Initialize repository crystallization | `context-crystallizer init ./my-repo` | `<repo-path>` (required)<br>`--exclude <patterns...>` (optional, adds to .gitignore & defaults) |
 | **progress** | Check crystallization progress | `context-crystallizer progress` | `--json` (optional) |
 | **search** | Search crystallized contexts | `context-crystallizer search "authentication"` | `<query>` (required)<br>`--max-tokens <number>`<br>`--category <type>`<br>`--json` |
 | **bundle** | Bundle multiple contexts | `context-crystallizer bundle src/auth src/api` | `<files...>` (required)<br>`--max-tokens <number>`<br>`--json` |

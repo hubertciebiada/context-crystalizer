@@ -4,9 +4,9 @@ import { CrystallizerCore } from '../shared/crystallizer-core.js';
 
 export function createInitCommand() {
   return new Command('init')
-    .description('Initialize crystallization for a repository')
+    .description('Initialize crystallization for a repository. Automatically respects .gitignore patterns.')
     .argument('<repo-path>', 'Path to the repository to crystallize')
-    .option('-e, --exclude <patterns...>', 'Patterns to exclude from crystallization', ['node_modules', '.git', 'dist', 'build'])
+    .option('-e, --exclude <patterns...>', 'Additional patterns to exclude (beyond .gitignore and defaults: node_modules, .git, dist, build)', ['node_modules', '.git', 'dist', 'build'])
     .action(async (repoPath: string, options) => {
       try {
         console.log(chalk.blue('🔮 Initializing crystallization...'));
