@@ -46,7 +46,8 @@
       "Bash(gh release list:*)",
       "Bash(gh release:*)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(npm version:*)"
     ],
     "deny": []
   }
