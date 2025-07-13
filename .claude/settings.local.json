@@ -37,7 +37,9 @@
       "Bash(sed:*)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(node:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(npm run dev:cli:*)",
+      "Bash(npx tsx:*)"
     ],
     "deny": []
   }

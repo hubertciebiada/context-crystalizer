@@ -24,6 +24,14 @@ let crystallizerCore: CrystallizerCore;
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
+      name: 'get_crystallization_guidance',
+      description: 'Get comprehensive guidance for analyzing files and creating crystallized contexts. Call this when you need clarity on the crystallization process, methodology, or expected output format.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+      },
+    },
+    {
       name: 'init_crystallization',
       description: 'Initialize crystallization process for a repository. Crystallization transforms raw files into AI-optimized, searchable knowledge by systematically analyzing each file to extract its purpose, key concepts, and relationships.',
       inputSchema: {
@@ -284,6 +292,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 
   switch (name) {
+    case 'get_crystallization_guidance': {
+      const guidance = await crystallizerCore.getCrystallizationGuidance();
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(guidance, null, 2),
+          },
+        ],
+      };
+    }
+
     case 'init_crystallization': {
       const { repoPath, exclude } = args as { repoPath: string; exclude?: string[] };
       const result = await crystallizerCore.initializeCrystallization(repoPath, exclude);

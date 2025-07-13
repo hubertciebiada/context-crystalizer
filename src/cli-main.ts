@@ -10,6 +10,7 @@ import { createRelatedCommand } from './commands/related.js';
 import { createValidateCommand } from './commands/validate.js';
 import { createUpdateCommand } from './commands/update.js';
 import { createMcpCommand } from './commands/mcp.js';
+import { createGuidanceCommand } from './commands/guidance.js';
 
 const program = new Command();
 
@@ -26,6 +27,7 @@ program.addCommand(createBundleCommand());
 program.addCommand(createRelatedCommand());
 program.addCommand(createValidateCommand());
 program.addCommand(createUpdateCommand());
+program.addCommand(createGuidanceCommand());
 program.addCommand(createMcpCommand());
 
 // Add help examples
@@ -39,6 +41,7 @@ Examples:
   ${chalk.cyan('context-crystallizer related src/auth.ts')}     Find related contexts
   ${chalk.cyan('context-crystallizer validate')}               Validate quality
   ${chalk.cyan('context-crystallizer update')}                 Update changed contexts
+  ${chalk.cyan('context-crystallizer guidance')}               Get analysis guidance
   ${chalk.cyan('context-crystallizer mcp')}                    Start MCP server
 
 For AI Agent Integration:

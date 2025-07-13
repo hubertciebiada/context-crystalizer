@@ -5,6 +5,12 @@ import { ContextSearch } from '../core/context-search.js';
 import { ContextValidator } from '../core/context-validator.js';
 import { ChangeDetector } from '../core/change-detector.js';
 import { ContextUpdater } from '../core/context-updater.js';
+import path from 'path';
+import { promises as fs } from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export interface CrystallizerContext {
   purpose: string;
@@ -48,7 +54,103 @@ export class CrystallizerCore {
     const allFilePaths = files.map(f => f.path);
     await this.contextStorage.initialize(allFilePaths);
 
+    // Create template files for user customization
+    await this.createTemplateFiles(repoPath);
+
     return { filesQueued: files.length };
+  }
+
+  private async createTemplateFiles(repoPath: string): Promise<void> {
+    const templatesDir = path.join(repoPath, '.context-crystalizer', 'templates');
+    await fs.mkdir(templatesDir, { recursive: true });
+
+    // Define template files to copy
+    const templateFiles = [
+      'overview-template.md',
+      'standard-template.md', 
+      'detailed-template.md'
+    ];
+
+    // Copy template files from the package templates directory
+    const packageTemplatesDir = path.resolve(__dirname, '../../templates');
+    
+    for (const templateFile of templateFiles) {
+      const sourcePath = path.join(packageTemplatesDir, templateFile);
+      const destPath = path.join(templatesDir, templateFile);
+      
+      // Only create if it doesn't exist (don't overwrite user customizations)
+      try {
+        await fs.access(destPath);
+        // File exists, skip
+      } catch {
+        // File doesn't exist, copy it
+        try {
+          const templateContent = await fs.readFile(sourcePath, 'utf-8');
+          await fs.writeFile(destPath, templateContent);
+        } catch (error) {
+          // If we can't read from package templates, create basic versions
+          await this.createDefaultTemplate(destPath, templateFile);
+        }
+      }
+    }
+  }
+
+  private async createDefaultTemplate(destPath: string, templateFile: string): Promise<void> {
+    let content = '';
+    
+    switch (templateFile) {
+      case 'overview-template.md':
+        content = `# Overview Template (≤50 tokens)
+
+Extract ultra-compact information for indexing and search.
+
+## Required Fields
+- purpose: Single sentence describing what this file does
+- keyTerms: Array of 3-5 searchable keywords
+- category: File type (config, source, test, docs, other)
+
+Focus on essential identification information for search.`;
+        break;
+
+      case 'standard-template.md':
+        content = `# Standard Template (≤200 tokens)
+
+Extract regular analysis information for most files.
+
+## Required Fields
+- purpose: 2-3 sentences describing file's role and functionality
+- keyAPIs: Array of key functions, classes, exports
+
+## Optional Fields
+- dependencies: Important imports and dependencies
+- patterns: Implementation patterns and conventions
+- relatedContexts: Related files that work together
+
+Focus on information useful for AI understanding.`;
+        break;
+
+      case 'detailed-template.md':
+        content = `# Detailed Template (≤2000 tokens)
+
+Extract comprehensive analysis for complex, high-value files.
+
+## Required Fields
+- purpose: Detailed explanation of file's role and architecture
+- keyAPIs: Detailed functions, classes, methods with descriptions
+
+## Optional Fields
+- dependencies: Comprehensive list of imports with purposes
+- patterns: Architectural patterns and design decisions
+- aiGuidance: Specific guidance for AI agents
+- errorHandling: Error scenarios and handling strategies
+- integrationPoints: Connections to external systems
+- relatedContexts: Closely related files
+
+Focus on comprehensive understanding for complex files.`;
+        break;
+    }
+    
+    await fs.writeFile(destPath, content);
   }
 
   async getNextFileForCrystallization() {
@@ -277,5 +379,92 @@ export class CrystallizerCore {
       type: 'update_result',
       ...updateResult,
     };
+  }
+
+  async getCrystallizationGuidance(repoPath?: string): Promise<any> {
+    // Use provided repo path or try to determine from initialized context storage
+    const targetRepoPath = repoPath || (this.contextStorage ? this.contextStorage['repoPath'] : null);
+    
+    if (!targetRepoPath) {
+      throw new Error('Repository path not available. Ensure repository is initialized or provide repoPath parameter.');
+    }
+
+    const templatesDir = path.join(targetRepoPath, '.context-crystalizer', 'templates');
+    
+    // Load templates from files
+    const templates = await this.loadTemplatesFromFiles(templatesDir);
+
+    return {
+      whoAmI: "You are a world-class text and code analyzer with exceptional pattern recognition abilities. Your expertise lies in extracting meaningful insights from any type of file or document. You excel at identifying core functionality, relationships, and creating AI-consumable knowledge representations.",
+      
+      whatAmIDoing: "You are transforming repository files into crystallized, indexed knowledge that enables efficient AI-powered analysis and search. Each file you analyze becomes part of a searchable knowledge base.",
+      
+      whyItMatters: "This creates a searchable knowledge base where AI agents can quickly locate relevant information without reading entire files. Your analysis enables semantic search and efficient repository understanding.",
+      
+      goal: "Create token-efficient, indexed contexts that preserve essential information while enabling fast semantic search. Optimize for AI comprehension and searchability.",
+      
+      templates,
+      
+      templateSelection: {
+        overview: "Generate for every file to create searchable index entries. Ultra-compact for maximum coverage.",
+        standard: "Use for config files, utilities, simple components, and medium complexity files. Balance detail with efficiency.",
+        detailed: "Use for complex source files, core business logic, APIs, and high-value components. Maximum detail within token limits."
+      },
+      
+      analysisMethodology: {
+        step1: "Read and understand the file's primary purpose and role in the system",
+        step2: "Identify key APIs, functions, classes, and exports that other code would use",
+        step3: "Map important dependencies and relationships to other files",
+        step4: "Recognize implementation patterns, architectural decisions, and conventions",
+        step5: "Extract AI-specific guidance for working with or modifying this code",
+        step6: "Include error handling strategies and integration points where relevant"
+      },
+      
+      qualityStandards: [
+        "Focus on functionality over implementation details",
+        "Prioritize information useful for AI agents and search",
+        "Use consistent terminology across all analyses",
+        "Include cross-references to related files when relevant",
+        "Maintain token efficiency while preserving essential clarity",
+        "Extract searchable keywords and functional descriptions"
+      ],
+      
+      indexingNote: "All crystallized knowledge is automatically indexed for semantic search. Focus on extracting searchable keywords, functional descriptions, and relationships that would help AI agents locate relevant code.",
+      
+      expectation: "Analyze files systematically and thoroughly. Each analysis contributes to the repository's searchable knowledge base. Maintain consistency and quality across all analyses. Generate overview analysis for every file to ensure complete search coverage.",
+      
+      templateCustomization: `Templates are stored in ${templatesDir} and can be customized by users. These files define the structure and guidance for each analysis type.`
+    };
+  }
+
+  private async loadTemplatesFromFiles(templatesDir: string): Promise<any> {
+    const templates: any = {};
+    
+    const templateFiles = [
+      { name: 'overview', file: 'overview-template.md' },
+      { name: 'standard', file: 'standard-template.md' },
+      { name: 'detailed', file: 'detailed-template.md' }
+    ];
+
+    for (const { name, file } of templateFiles) {
+      try {
+        const templatePath = path.join(templatesDir, file);
+        const content = await fs.readFile(templatePath, 'utf-8');
+        templates[name] = {
+          name,
+          guidance: content,
+          source: templatePath
+        };
+      } catch (error) {
+        // Fallback to basic template definition if file can't be read
+        templates[name] = {
+          name,
+          guidance: `Basic ${name} template - customize by editing template files`,
+          source: 'built-in fallback'
+        };
+      }
+    }
+
+    return templates;
   }
 }
