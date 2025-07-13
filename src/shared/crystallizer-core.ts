@@ -173,7 +173,6 @@ Focus on comprehensive understanding for complex files.`;
         priority: nextFile.priority,
         fileType: nextFile.fileType,
         estimatedTokens: nextFile.estimatedTokens,
-        complexity: nextFile.complexity,
         category: nextFile.category,
         lastModified: nextFile.lastModified,
       },
@@ -187,7 +186,6 @@ Focus on comprehensive understanding for complex files.`;
 
     // Convert partial metadata to complete metadata if provided
     const completeMetadata = fileMetadata ? {
-      complexity: fileMetadata.complexity || 'medium' as const,
       category: fileMetadata.category || 'other' as const,
       estimatedTokens: fileMetadata.estimatedTokens || 1000
     } : undefined;

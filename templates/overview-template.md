@@ -21,6 +21,14 @@
 - **Format**: Single category from: config, source, test, docs, other
 - **Focus**: File classification for filtering
 
+### complexity (required)
+- **Max tokens**: 5
+- **Format**: Single value from: low, medium, high
+- **Focus**: Logical/cognitive complexity of content, NOT file size
+- **Low**: Simple configs, basic utilities, straightforward documentation
+- **Medium**: Standard business logic, moderate abstractions, typical components
+- **High**: Complex algorithms, intricate state machines, dense abstractions
+
 ## Analysis Guidelines
 
 1. **Be concise**: Every word must add search value
@@ -33,7 +41,8 @@
 {
   "purpose": "Authentication middleware that validates JWT tokens for API requests",
   "keyTerms": ["JWT", "authentication", "middleware", "API", "validation"],
-  "category": "source"
+  "category": "source",
+  "complexity": "medium"
 }
 ```
 

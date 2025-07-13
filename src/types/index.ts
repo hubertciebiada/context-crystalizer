@@ -43,7 +43,6 @@ export interface FileQueueItem {
   priority: number;
   fileType: string;
   estimatedTokens: number;
-  complexity: 'low' | 'medium' | 'high';
   category: 'config' | 'source' | 'test' | 'docs' | 'other';
   lastModified: Date;
 }

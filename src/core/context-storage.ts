@@ -28,7 +28,7 @@ export class ContextStorage {
     filePath: string, 
     context: Partial<CrystallizedContext>,
     fileContent?: string,
-    fileMetadata?: { complexity: 'low' | 'medium' | 'high'; category: 'config' | 'source' | 'test' | 'docs' | 'other'; estimatedTokens: number }
+    fileMetadata?: { category: 'config' | 'source' | 'test' | 'docs' | 'other'; estimatedTokens: number }
   ): Promise<void> {
     // Ensure we always work with relative paths for portability
     const relativePath = path.isAbsolute(filePath) 
@@ -37,9 +37,9 @@ export class ContextStorage {
     const contextPath = this.getContextPath(relativePath);
     const absoluteFilePath = path.isAbsolute(filePath) ? filePath : path.join(this.repoPath, filePath);
     
-    // Determine template based on complexity and category
+    // Determine template based on category and estimated tokens (complexity will be determined by AI)
     const template = context.template || this.templateManager.determineTemplateForFile(
-      fileMetadata?.complexity || 'medium',
+      'medium', // Default complexity for template selection, AI will determine actual complexity
       fileMetadata?.category || 'other',
       fileMetadata?.estimatedTokens || 1000
     );
@@ -60,7 +60,7 @@ export class ContextStorage {
       relatedContexts: context.relatedContexts || [],
       lastModified: new Date(),
       template,
-      complexity: fileMetadata?.complexity || 'medium',
+      complexity: (context.complexity as 'low' | 'medium' | 'high') || 'medium',
       category: fileMetadata?.category || 'other',
       crossReferences,
       aiGuidance: context.aiGuidance,
@@ -257,6 +257,11 @@ export class ContextStorage {
         `- By category: ${categoryStats}`,
         `- By template: ${templateStatsStr}`,
         `- Total tokens: ${totalTokens}`,
+        '',
+        '## Complexity Legend',
+        '- 🟢 **Low complexity**: Simple files, easy to understand',
+        '- 🟡 **Medium complexity**: Moderate complexity, standard logic',
+        '- 🔴 **High complexity**: Complex files requiring careful analysis',
         '',
         '## Contexts by Category',
         '',

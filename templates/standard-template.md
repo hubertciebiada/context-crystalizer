@@ -36,6 +36,13 @@
 - **Focus**: Files that are commonly used together or depend on each other
 - **Example**: ["components/UserProfile.tsx", "hooks/useAuth.ts", "contexts/AuthContext.tsx"]
 
+### complexity (optional)
+- **Max tokens**: 5
+- **Format**: Single value from: low, medium, high
+- **Focus**: Logical/cognitive complexity of content, NOT file size
+- **Assessment**: Consider abstractions, algorithm complexity, business logic intricacy
+- **Example**: "medium" for standard React component with hooks
+
 ## Analysis Guidelines
 
 1. **Extract essentials**: Focus on information useful for AI understanding
@@ -57,6 +64,7 @@
   "keyAPIs": ["LoginForm", "SignupForm", "validateEmail", "handleSubmit"],
   "dependencies": ["react", "formik", "../hooks/useAuth"],
   "patterns": ["React hooks pattern", "Form validation", "Context API"],
-  "relatedContexts": ["hooks/useAuth.ts", "contexts/AuthContext.tsx"]
+  "relatedContexts": ["hooks/useAuth.ts", "contexts/AuthContext.tsx"],
+  "complexity": "medium"
 }
 ```

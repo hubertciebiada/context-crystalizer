@@ -61,6 +61,15 @@
 - **Include**: Nature of relationship
 - **Example**: ["middleware/cors.ts - Sets up CORS before auth", "routes/auth.ts - Uses this middleware"]
 
+### complexity (optional)
+- **Max tokens**: 5
+- **Format**: Single value from: low, medium, high
+- **Focus**: Logical/cognitive complexity of content, NOT file size
+- **Low**: Simple utilities, basic configs, straightforward documentation
+- **Medium**: Standard business logic, moderate abstractions, typical service classes
+- **High**: Complex algorithms, intricate state machines, advanced architectural patterns
+- **Assessment**: Consider conceptual difficulty, abstraction levels, interdependencies
+
 ## Analysis Guidelines
 
 1. **Comprehensive coverage**: Include all important aspects of the file
@@ -116,6 +125,7 @@
     "middleware/cors.ts - CORS middleware that runs before authentication",
     "routes/auth.ts - Authentication routes that use this middleware",
     "models/User.ts - User model used for authentication data"
-  ]
+  ],
+  "complexity": "high"
 }
 ```

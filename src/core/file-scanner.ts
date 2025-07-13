@@ -128,7 +128,6 @@ export class FileScanner {
         priority: fileInfo.priority,
         fileType: fileInfo.fileType,
         estimatedTokens: fileInfo.estimatedTokens,
-        complexity: fileInfo.complexity,
         category: fileInfo.category,
         lastModified: stats.mtime,
       });
@@ -164,7 +163,6 @@ export class FileScanner {
     priority: number;
     fileType: string;
     estimatedTokens: number;
-    complexity: 'low' | 'medium' | 'high';
     category: 'config' | 'source' | 'test' | 'docs' | 'other';
   } {
     const ext = path.extname(filePath);
@@ -198,14 +196,12 @@ export class FileScanner {
     // Calculate estimated tokens
     const estimatedTokens = Math.ceil(fileSize * config.tokensPerByte);
     
-    // Determine complexity based on size and file type
-    const complexity = this.calculateComplexity(fileSize, config.category);
+    // Complexity will be determined by AI during crystallization
     
     return {
       priority: Math.max(0, Math.min(100, priority)),
       fileType: ext || 'unknown',
       estimatedTokens,
-      complexity,
       category: config.category,
     };
   }
@@ -259,13 +255,4 @@ export class FileScanner {
     return /^(package\.json|tsconfig\.json|webpack\.config|babel\.config|eslint|prettier|docker|makefile|cargo\.toml|go\.mod|requirements\.txt)/.test(fileName.toLowerCase());
   }
 
-  private calculateComplexity(size: number, category: string): 'low' | 'medium' | 'high' {
-    if (category === 'config' || category === 'docs') {
-      return size > 5000 ? 'medium' : 'low';
-    }
-    
-    if (size < 1000) return 'low';
-    if (size < 10000) return 'medium';
-    return 'high';
-  }
 }
