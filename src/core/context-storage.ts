@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import pLimit from 'p-limit';
 import { CrystallizedContext } from '../types/index.js';
 import { TemplateManager } from './template-manager.js';
 import { CrossReferenceAnalyzer } from './cross-reference-analyzer.js';
@@ -10,6 +11,9 @@ export class ContextStorage {
   private contextBasePath: string;
   private templateManager: TemplateManager;
   private allFiles: string[] = [];
+  
+  // Concurrent index operation support
+  private indexMutex = pLimit(1); // Mutex: only 1 agent can update index at a time
 
   constructor(repoPath: string) {
     this.repoPath = path.resolve(repoPath);
@@ -210,8 +214,11 @@ export class ContextStorage {
   }
 
   private async updateIndex(_context: CrystallizedContext): Promise<void> {
-    // Regenerate the entire index for consistency
-    await this.regenerateFullIndex();
+    // Critical section: only one agent can update index at a time
+    return this.indexMutex(async () => {
+      // Regenerate the entire index for consistency
+      await this.regenerateFullIndex();
+    });
   }
 
   private async regenerateFullIndex(): Promise<void> {
@@ -301,44 +308,47 @@ export class ContextStorage {
     totalTokens: number;
     avgTokensPerContext: number;
   }> {
-    const metadataDir = path.join(this.contextBasePath, 'ai-metadata');
-    
-    try {
-      const metadataFiles = await fs.readdir(metadataDir);
-      const contexts: any[] = [];
+    // Use index mutex to ensure consistent read during potential index updates
+    return this.indexMutex(async () => {
+      const metadataDir = path.join(this.contextBasePath, 'ai-metadata');
       
-      for (const file of metadataFiles) {
-        if (file.endsWith('.json')) {
-          const content = await fs.readFile(path.join(metadataDir, file), 'utf-8');
-          contexts.push(JSON.parse(content));
+      try {
+        const metadataFiles = await fs.readdir(metadataDir);
+        const contexts: any[] = [];
+        
+        for (const file of metadataFiles) {
+          if (file.endsWith('.json')) {
+            const content = await fs.readFile(path.join(metadataDir, file), 'utf-8');
+            contexts.push(JSON.parse(content));
+          }
         }
+        
+        const byCategory: Record<string, number> = {};
+        const byTemplate: Record<string, number> = {};
+        let totalTokens = 0;
+        
+        contexts.forEach(ctx => {
+          byCategory[ctx.category] = (byCategory[ctx.category] || 0) + 1;
+          byTemplate[ctx.template] = (byTemplate[ctx.template] || 0) + 1;
+          totalTokens += ctx.tokenCount || 0;
+        });
+        
+        return {
+          totalContexts: contexts.length,
+          byCategory,
+          byTemplate,
+          totalTokens,
+          avgTokensPerContext: contexts.length > 0 ? totalTokens / contexts.length : 0,
+        };
+      } catch (_error) {
+        return {
+          totalContexts: 0,
+          byCategory: {},
+          byTemplate: {},
+          totalTokens: 0,
+          avgTokensPerContext: 0,
+        };
       }
-      
-      const byCategory: Record<string, number> = {};
-      const byTemplate: Record<string, number> = {};
-      let totalTokens = 0;
-      
-      contexts.forEach(ctx => {
-        byCategory[ctx.category] = (byCategory[ctx.category] || 0) + 1;
-        byTemplate[ctx.template] = (byTemplate[ctx.template] || 0) + 1;
-        totalTokens += ctx.tokenCount || 0;
-      });
-      
-      return {
-        totalContexts: contexts.length,
-        byCategory,
-        byTemplate,
-        totalTokens,
-        avgTokensPerContext: contexts.length > 0 ? totalTokens / contexts.length : 0,
-      };
-    } catch (_error) {
-      return {
-        totalContexts: 0,
-        byCategory: {},
-        byTemplate: {},
-        totalTokens: 0,
-        avgTokensPerContext: 0,
-      };
-    }
+    });
   }
 }
