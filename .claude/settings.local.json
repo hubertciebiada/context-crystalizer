@@ -40,7 +40,11 @@
       "Bash(timeout:*)",
       "Bash(npm run dev:cli:*)",
       "Bash(npx tsx:*)",
-      "Bash(gh repo view:*)"
+      "Bash(gh repo view:*)",
+      "Bash(gh workflow:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release list:*)",
+      "Bash(gh release:*)"
     ],
     "deny": []
   }

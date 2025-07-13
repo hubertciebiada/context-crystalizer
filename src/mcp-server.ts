@@ -10,7 +10,7 @@ const server = new Server(
   {
     name: 'context-crystallizer',
     version: '0.1.0',
-    description: 'Transform large repositories into crystallized, AI-consumable knowledge. Crystallization systematically analyzes each file to extract purpose, APIs, patterns, and relationships.',
+    description: 'Transform large repositories into crystallized, AI-consumable knowledge. Crystallization systematically analyzes each file to extract purpose, APIs, patterns, and relationships. IMPORTANT: Call get_crystallization_guidance once before starting any crystallization work to understand the analysis methodology.',
   },
   {
     capabilities: {
@@ -25,7 +25,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: 'get_crystallization_guidance',
-      description: 'Get comprehensive guidance for analyzing files and creating crystallized contexts. Call this when you need clarity on the crystallization process, methodology, or expected output format.',
+      description: 'CALL ONCE FIRST: Get comprehensive analysis guidance before starting crystallization work. Provides methodology, templates, and quality standards for entire session. Essential for consistent, high-quality crystallization.',
       inputSchema: {
         type: 'object',
         properties: {},
@@ -33,7 +33,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'init_crystallization',
-      description: 'Initialize crystallization process for a repository. Crystallization transforms raw files into AI-optimized, searchable knowledge by systematically analyzing each file to extract its purpose, key concepts, and relationships.',
+      description: 'Initialize crystallization process for a repository. Crystallization transforms raw files into AI-optimized, searchable knowledge by systematically analyzing each file to extract its purpose, key concepts, and relationships. PREREQUISITE: Call get_crystallization_guidance once per session first for analysis methodology.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -53,7 +53,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'get_next_file_to_crystallize',
-      description: 'Get the next file from the repository for crystallization into AI-consumable context. Returns file content and metadata for AI analysis.',
+      description: 'Get the next file from the repository for crystallization into AI-consumable context. Returns file content and metadata for AI analysis. PREREQUISITE: Call get_crystallization_guidance once per session first.',
       inputSchema: {
         type: 'object',
         properties: {},
