@@ -39,7 +39,8 @@
       "Bash(node:*)",
       "Bash(timeout:*)",
       "Bash(npm run dev:cli:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(gh repo view:*)"
     ],
     "deny": []
   }

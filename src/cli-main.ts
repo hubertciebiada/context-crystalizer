@@ -2,6 +2,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { createGuidanceCommand } from './commands/guidance.js';
 import { createInitCommand } from './commands/init.js';
 import { createProgressCommand } from './commands/progress.js';
 import { createSearchCommand } from './commands/search.js';
@@ -10,7 +11,6 @@ import { createRelatedCommand } from './commands/related.js';
 import { createValidateCommand } from './commands/validate.js';
 import { createUpdateCommand } from './commands/update.js';
 import { createMcpCommand } from './commands/mcp.js';
-import { createGuidanceCommand } from './commands/guidance.js';
 
 const program = new Command();
 
@@ -20,6 +20,7 @@ program
   .version('1.0.0');
 
 // Add all commands
+program.addCommand(createGuidanceCommand());
 program.addCommand(createInitCommand());
 program.addCommand(createProgressCommand());
 program.addCommand(createSearchCommand());
@@ -27,13 +28,13 @@ program.addCommand(createBundleCommand());
 program.addCommand(createRelatedCommand());
 program.addCommand(createValidateCommand());
 program.addCommand(createUpdateCommand());
-program.addCommand(createGuidanceCommand());
 program.addCommand(createMcpCommand());
 
 // Add help examples
 program.addHelpText('after', `
 
 Examples:
+  ${chalk.cyan('context-crystallizer guidance')}               Get analysis guidance
   ${chalk.cyan('context-crystallizer init ./my-repo')}           Initialize crystallization
   ${chalk.cyan('context-crystallizer progress')}                Check crystallization progress
   ${chalk.cyan('context-crystallizer search "auth"')}           Search for authentication contexts
@@ -41,7 +42,6 @@ Examples:
   ${chalk.cyan('context-crystallizer related src/auth.ts')}     Find related contexts
   ${chalk.cyan('context-crystallizer validate')}               Validate quality
   ${chalk.cyan('context-crystallizer update')}                 Update changed contexts
-  ${chalk.cyan('context-crystallizer guidance')}               Get analysis guidance
   ${chalk.cyan('context-crystallizer mcp')}                    Start MCP server
 
 For AI Agent Integration:
