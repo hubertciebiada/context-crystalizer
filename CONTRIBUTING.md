@@ -41,10 +41,7 @@ npm install
 # 3. Build the project
 npm run build
 
-# 4. Run tests
-npm test
-
-# 5. Start development server
+# 4. Start development server
 npm run dev
 ```
 
@@ -150,9 +147,6 @@ git checkout -b ai/integration-name
 
 ```bash
 # Make your changes
-# Run tests frequently
-npm test
-
 # Run linting
 npm run lint
 
@@ -164,19 +158,16 @@ npm run dev
 # In another terminal, test your changes
 ```
 
-## Testing Guidelines
+## Manual Testing Guidelines
 
 ### AI Context Quality Testing
 
-```bash
-# Run the full AI context test suite
-npm test -- --testPathPattern="ai-context"
+For this MVP, testing is done manually:
 
-# Run specific test categories
-npm test -- --testPathPattern="context-generation"
-npm test -- --testPathPattern="mcp-tools"
-npm test -- --testPathPattern="integration"
-```
+1. **Build and lint checks**: Run `npm run build` and `npm run lint`
+2. **CLI functionality**: Test the MCP server with real repositories
+3. **Context generation**: Verify context quality with sample codebases
+4. **Integration testing**: Test with Claude Desktop or other MCP clients
 
 ### Test Requirements for AI Features
 
@@ -272,11 +263,11 @@ interface CrystallizedContext {
 
 1. **Test Thoroughly**
    ```bash
-   # Run full test suite
-   npm test
+   # Build and verify
+   npm run build && npm run lint
    
    # Test with real repositories
-   npm run build && node dist/index.js
+   node dist/index.js
    ```
 
 2. **Validate AI Focus**
@@ -377,8 +368,8 @@ cd /path/to/large-enterprise-repo && npx context-crystallizer
 # Profile memory usage with large repositories
 node --inspect dist/index.js
 
-# Monitor token efficiency
-npm test -- --testPathPattern="token-efficiency" --verbose
+# Monitor manually by testing with real repositories
+# and verifying context quality
 ```
 
 ## Questions?

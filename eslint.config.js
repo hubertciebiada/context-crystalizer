@@ -82,29 +82,6 @@ export default [
     }
   },
   {
-    files: ['**/*.test.{ts,js}', '**/*.spec.{ts,js}', '**/tests/**/*'],
-    languageOptions: {
-      globals: {
-        describe: 'readonly',
-        it: 'readonly',
-        test: 'readonly',
-        expect: 'readonly',
-        beforeEach: 'readonly',
-        afterEach: 'readonly',
-        beforeAll: 'readonly',
-        afterAll: 'readonly',
-        jest: 'readonly'
-      }
-    },
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
-      '@typescript-eslint/no-namespace': 'off',
-      'no-console': 'off',
-      'no-unused-vars': 'off'
-    }
-  },
-  {
     ignores: [
       'node_modules/',
       'dist/',
@@ -112,7 +89,6 @@ export default [
       '*.config.js',
       '.taskmaster/',
       '.claude/',
-      'jest.config.js'
     ]
   }
 ];

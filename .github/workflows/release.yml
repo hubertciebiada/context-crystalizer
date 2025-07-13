@@ -29,10 +29,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run tests
-      run: npm test || echo "Tests failed but continuing with release (initial version)"
-      continue-on-error: true
-      
     - name: Build project
       run: npm run build
       

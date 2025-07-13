@@ -8,8 +8,6 @@
       "Bash(ls:*)",
       "Bash(npm run build:*)",
       "mcp__taskmaster-ai__set_task_status",
-      "Bash(npm test)",
-      "Bash(npm test:*)",
       "Bash(rm:*)",
       "Bash(npm run clean:*)",
       "Bash(npm pack:*)",
@@ -29,7 +27,8 @@
       "mcp__github__list_tags",
       "Bash(gh release create:*)",
       "Bash(npm install:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": []
   }
