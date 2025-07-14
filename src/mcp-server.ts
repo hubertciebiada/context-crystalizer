@@ -10,7 +10,7 @@ const server = new Server(
   {
     name: 'context-crystallizer',
     version: '0.1.0',
-    description: 'Transform large repositories into crystallized, AI-consumable knowledge. Crystallization systematically analyzes each file to extract purpose, APIs, patterns, and relationships. IMPORTANT: Call get_crystallization_guidance once before starting any crystallization work to understand the analysis methodology.',
+    description: 'Transform large repositories into crystallized, AI-consumable knowledge. Crystallization systematically analyzes each file to extract purpose, key concepts, patterns, and relationships. IMPORTANT: Call get_crystallization_guidance once before starting any crystallization work to understand the analysis methodology.',
   },
   {
     capabilities: {
@@ -25,7 +25,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
       name: 'get_crystallization_guidance',
-      description: 'CALL ONCE FIRST: Get comprehensive analysis guidance before starting crystallization work. Provides methodology, templates, and quality standards for entire session. Essential for consistent, high-quality crystallization.',
+      description: 'Get comprehensive analysis guidance for crystallization work. Provides methodology, templates, and quality standards. Call AFTER init_crystallization to access repository-specific templates.',
       inputSchema: {
         type: 'object',
         properties: {},
@@ -33,7 +33,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'init_crystallization',
-      description: 'Initialize crystallization process for a repository. Crystallization transforms raw files into AI-optimized, searchable knowledge by systematically analyzing each file to extract its purpose, key concepts, and relationships. PREREQUISITE: Call get_crystallization_guidance once per session first for analysis methodology.',
+      description: 'Initialize crystallization process for a repository. Crystallization transforms raw files into AI-optimized, searchable knowledge by systematically analyzing each file to extract its purpose, key concepts, and relationships.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -53,7 +53,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     },
     {
       name: 'get_next_file_to_crystallize',
-      description: 'Get the next file from the repository for crystallization into AI-consumable context. Returns file content and metadata for AI analysis. PREREQUISITE: Call get_crystallization_guidance once per session first.',
+      description: 'Get the next file from the repository for crystallization into AI-consumable context. Returns file content and metadata for AI analysis.',
       inputSchema: {
         type: 'object',
         properties: {},
@@ -73,10 +73,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             type: 'object',
             properties: {
               purpose: { type: 'string', description: 'Primary purpose and functionality' },
-              keyAPIs: {
+              keyTerms: {
                 type: 'array',
                 items: { type: 'string' },
-                description: 'Key APIs, functions, or exports for AI consumption',
+                description: 'Key searchable terms, concepts, entities for AI search and discovery',
               },
               dependencies: {
                 type: 'array',
@@ -108,7 +108,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
                 description: 'Key integration points with other systems',
               },
             },
-            required: ['purpose', 'keyAPIs'],
+            required: ['purpose', 'keyTerms'],
           },
           fileContent: {
             type: 'string',

@@ -180,12 +180,12 @@ export class ContextValidator {
       score -= 30;
     }
     
-    if (context.keyAPIs.length === 0) {
+    if (context.keyTerms.length === 0) {
       issues.push({
         severity: 'warning',
         category: 'completeness',
-        message: 'No key APIs defined - consider adding main functions/exports',
-        field: 'keyAPIs',
+        message: 'No key terms defined - consider adding main concepts/entities',
+        field: 'keyTerms',
       });
       score -= 20;
     }
@@ -232,17 +232,17 @@ export class ContextValidator {
       score -= 20;
     }
     
-    // Check API specificity
-    const vagueAPIs = context.keyAPIs.filter(api => 
-      api.length < 10 || /^(function|method|class)\s*$/i.test(api)
+    // Check term specificity
+    const vagueTerms = context.keyTerms.filter(term => 
+      term.length < 3 || /^(function|method|class|item|thing)\s*$/i.test(term)
     );
     
-    if (vagueAPIs.length > 0) {
+    if (vagueTerms.length > 0) {
       issues.push({
         severity: 'warning',
         category: 'usefulness',
-        message: `${vagueAPIs.length} API descriptions are too vague`,
-        field: 'keyAPIs',
+        message: `${vagueTerms.length} key terms are too vague`,
+        field: 'keyTerms',
       });
       score -= 15;
     }
@@ -277,17 +277,17 @@ export class ContextValidator {
       score -= 5;
     }
     
-    // Check API formatting
-    const poorlyFormattedAPIs = context.keyAPIs.filter(api => 
-      !api.includes('(') && !api.includes(':') && api.length > 20
+    // Check term formatting
+    const poorlyFormattedTerms = context.keyTerms.filter(term => 
+      term.length > 30 || /^\s|\s$/.test(term)
     );
     
-    if (poorlyFormattedAPIs.length > 0) {
+    if (poorlyFormattedTerms.length > 0) {
       issues.push({
         severity: 'info',
         category: 'format',
-        message: 'Some APIs lack function signatures or type information',
-        field: 'keyAPIs',
+        message: 'Some key terms are too long or have formatting issues',
+        field: 'keyTerms',
       });
       score -= 10;
     }
@@ -366,14 +366,14 @@ export class ContextValidator {
     
     if (metrics.completeness < 80) {
       suggestions.push('Add more detail to the purpose section explaining the specific functionality');
-      if (context.keyAPIs.length < 3 && context.category === 'source') {
-        suggestions.push('Include more key APIs, functions, or exported elements');
+      if (context.keyTerms.length < 3 && context.category === 'source') {
+        suggestions.push('Include more key terms, concepts, or important elements');
       }
     }
     
     if (metrics.specificity < 70) {
       suggestions.push('Replace generic terms with specific technical details');
-      suggestions.push('Include parameter types, return values, or usage examples for APIs');
+      suggestions.push('Include more specific details, types, or usage examples for key terms');
     }
     
     if (metrics.tokenEfficiency < 60) {
@@ -416,7 +416,7 @@ export class ContextValidator {
     
     const avgCompleteness = results.reduce((sum, r) => sum + r.metrics.completeness, 0) / results.length;
     if (avgCompleteness < 75) {
-      recommendations.push('Improve context completeness by adding more detailed purposes and API descriptions');
+      recommendations.push('Improve context completeness by adding more detailed purposes and key term descriptions');
     }
     
     const avgEfficiency = results.reduce((sum, r) => sum + r.metrics.tokenEfficiency, 0) / results.length;
@@ -471,7 +471,7 @@ export class ContextValidator {
       filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: '',
-      keyAPIs: [],
+      keyTerms: [],
       dependencies: [],
       patterns: [],
       relatedContexts: [],
@@ -493,7 +493,7 @@ export class ContextValidator {
       if (title?.includes('purpose')) {
         context.purpose = lines.slice(1).join('\n').trim();
       } else if (title?.includes('key apis')) {
-        context.keyAPIs = lines.slice(1)
+        context.keyTerms = lines.slice(1)
           .filter(line => line.startsWith('- '))
           .map(line => line.substring(2));
       } else if (title?.includes('dependencies')) {

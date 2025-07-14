@@ -58,7 +58,7 @@ export class ContextStorage {
       filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: context.purpose || '',
-      keyAPIs: context.keyAPIs || [],
+      keyTerms: context.keyTerms || [],
       dependencies: context.dependencies || [],
       patterns: context.patterns || [],
       relatedContexts: context.relatedContexts || [],
@@ -117,7 +117,7 @@ export class ContextStorage {
       tokenCount: context.tokenCount,
       lastModified: context.lastModified,
       crossReferences: context.crossReferences,
-      keyAPIs: context.keyAPIs,
+      keyTerms: context.keyTerms,
       dependencies: context.dependencies,
     };
     
@@ -142,7 +142,7 @@ export class ContextStorage {
       filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: '',
-      keyAPIs: [],
+      keyTerms: [],
       dependencies: [],
       patterns: [],
       relatedContexts: [],
@@ -162,8 +162,8 @@ export class ContextStorage {
       
       if (title?.includes('purpose')) {
         context.purpose = lines.slice(1).join('\n').trim();
-      } else if (title?.includes('key apis')) {
-        context.keyAPIs = lines.slice(1)
+      } else if (title?.includes('key terms')) {
+        context.keyTerms = lines.slice(1)
           .filter(line => line.startsWith('- '))
           .map(line => line.substring(2));
       } else if (title?.includes('dependencies')) {
@@ -285,8 +285,13 @@ export class ContextStorage {
           const complexityBadge = ctx.complexity === 'high' ? '🔴' : ctx.complexity === 'medium' ? '🟡' : '🟢';
           lines.push(`- ${complexityBadge} [${ctx.relativePath}](${contextPath})${tokenInfo}`);
           
-          if (ctx.keyAPIs?.length > 0) {
-            lines.push(`  - APIs: ${ctx.keyAPIs.slice(0, 3).join(', ')}${ctx.keyAPIs.length > 3 ? '...' : ''}`);
+          if (ctx.keyTerms?.length > 0) {
+            ctx.keyTerms.slice(0, 5).forEach((term: string) => {
+              lines.push(`  - ${term}`);
+            });
+            if (ctx.keyTerms.length > 5) {
+              lines.push(`  - ...and ${ctx.keyTerms.length - 5} more`);
+            }
           }
         });
         lines.push('');

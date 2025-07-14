@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 export interface CrystallizerContext {
   purpose: string;
-  keyAPIs: string[];
+  keyTerms: string[];
   dependencies?: string[];
   patterns?: string[];
   relatedContexts?: string[];
@@ -122,7 +122,7 @@ Extract regular analysis information for most files.
 
 ## Required Fields
 - purpose: 2-3 sentences describing file's role and functionality
-- keyAPIs: Array of key functions, classes, exports
+- keyTerms: Array of key searchable terms, concepts, entities
 
 ## Optional Fields
 - dependencies: Important imports and dependencies
@@ -139,7 +139,7 @@ Extract comprehensive analysis for complex, high-value files.
 
 ## Required Fields
 - purpose: Detailed explanation of file's role and architecture
-- keyAPIs: Detailed functions, classes, methods with descriptions
+- keyTerms: Detailed searchable terms, concepts, entities with semantic meaning
 
 ## Optional Fields
 - dependencies: Comprehensive list of imports with purposes
@@ -206,8 +206,12 @@ Focus on comprehensive understanding for complex files.`;
       estimatedTokens: fileMetadata.estimatedTokens || 1000
     } : undefined;
 
-    await this.contextStorage.storeContext(filePath, context, fileContent, completeMetadata);
-    await this.queueManager.markProcessed(filePath);
+    try {
+      await this.contextStorage.storeContext(filePath, context, fileContent, completeMetadata);
+    } finally {
+      // Always release file claim, even if storage fails
+      await this.queueManager.markProcessed(filePath);
+    }
 
     const stats = await this.contextStorage.getContextStatistics();
     return {
@@ -253,7 +257,7 @@ Focus on comprehensive understanding for complex files.`;
         tokens: r.context.tokenCount,
         highlights: r.highlights,
         purpose: `${r.context.purpose.substring(0, 150)}...`,
-        keyAPIs: r.context.keyAPIs.slice(0, 3),
+        keyTerms: r.context.keyTerms.slice(0, 3),
       })),
     };
   }
@@ -271,7 +275,7 @@ Focus on comprehensive understanding for complex files.`;
       contexts: bundle.contexts.map(ctx => ({
         file: ctx.relativePath,
         purpose: ctx.purpose,
-        keyAPIs: ctx.keyAPIs,
+        keyTerms: ctx.keyTerms,
         dependencies: ctx.dependencies,
         patterns: ctx.patterns,
         crossReferences: ctx.crossReferences,
@@ -296,7 +300,7 @@ Focus on comprehensive understanding for complex files.`;
         relevance: r.relevanceScore,
         category: r.context.category,
         purpose: `${r.context.purpose.substring(0, 100)}...`,
-        keyAPIs: r.context.keyAPIs.slice(0, 2),
+        keyTerms: r.context.keyTerms.slice(0, 2),
         relationship: r.highlights.join(', '),
       })),
     };
@@ -315,7 +319,7 @@ Focus on comprehensive understanding for complex files.`;
         file: r.context.relativePath,
         category: r.context.category,
         purpose: `${r.context.purpose.substring(0, 100)}...`,
-        keyAPIs: r.context.keyAPIs.slice(0, 3),
+        keyTerms: r.context.keyTerms.slice(0, 3),
         tokenCount: r.context.tokenCount,
       })),
     };
@@ -422,16 +426,17 @@ Focus on comprehensive understanding for complex files.`;
       templateSelection: {
         overview: "Generate for every file to create searchable index entries. Ultra-compact for maximum coverage.",
         standard: "Use for config files, utilities, simple components, and medium complexity files. Balance detail with efficiency.",
-        detailed: "Use for complex source files, core business logic, APIs, and high-value components. Maximum detail within token limits."
+        detailed: "Use for complex source files, core business logic, components, and high-value files. Maximum detail within token limits."
       },
       
       analysisMethodology: {
         step1: "Read and understand the file's primary purpose and role in the system",
-        step2: "Identify key APIs, functions, classes, and exports that other code would use",
+        step2: "Identify key terms, concepts, entities, functions, and important elements",
         step3: "Map important dependencies and relationships to other files",
         step4: "Recognize implementation patterns, architectural decisions, and conventions",
         step5: "Extract AI-specific guidance for working with or modifying this code",
-        step6: "Include error handling strategies and integration points where relevant"
+        step6: "Include error handling strategies and integration points where relevant",
+        continuity: "Continue processing ALL files in the repository - stopping mid-process breaks the knowledge base"
       },
       
       qualityStandards: [
@@ -445,7 +450,7 @@ Focus on comprehensive understanding for complex files.`;
       
       indexingNote: "All crystallized knowledge is automatically indexed for semantic search. Focus on extracting searchable keywords, functional descriptions, and relationships that would help AI agents locate relevant code.",
       
-      expectation: "Analyze files systematically and thoroughly. Each analysis contributes to the repository's searchable knowledge base. Maintain consistency and quality across all analyses. Generate overview analysis for every file to ensure complete search coverage.",
+      expectation: "Analyze files systematically and thoroughly. Each analysis contributes to the repository's searchable knowledge base. Maintain consistency and quality across all analyses. Generate overview analysis for every file to ensure complete search coverage. CRITICAL: Complete the full crystallization process - do not stop until all files are processed. Partial crystallization significantly reduces search effectiveness and knowledge base quality.",
       
       templateCustomization: `Templates are stored in ${templatesDir} and can be customized by users. These files define the structure and guidance for each analysis type.`
     };

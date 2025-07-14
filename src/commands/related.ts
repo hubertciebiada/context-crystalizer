@@ -34,8 +34,8 @@ export function createRelatedCommand() {
           console.log(chalk.gray(`   Category: ${match.category} | Relevance: ${(match.relevance * 100).toFixed(1)}%`));
           console.log(chalk.white(`   ${match.purpose}`));
           
-          if (match.keyAPIs.length > 0) {
-            console.log(chalk.blue(`   Key APIs: ${match.keyAPIs.join(', ')}`));
+          if (match.keyTerms.length > 0) {
+            console.log(chalk.blue(`   Key Terms: ${match.keyTerms.join(', ')}`));
           }
           
           if (match.relationship) {

@@ -36,8 +36,8 @@ export function createBundleCommand() {
           console.log(chalk.gray(`   Category: ${context.category} | Complexity: ${context.complexity} | Tokens: ${context.tokenCount}`));
           console.log(chalk.white(`   ${context.purpose}`));
           
-          if (context.keyAPIs && context.keyAPIs.length > 0) {
-            console.log(chalk.blue(`   Key APIs: ${context.keyAPIs.join(', ')}`));
+          if (context.keyTerms && context.keyTerms.length > 0) {
+            console.log(chalk.blue(`   Key Terms: ${context.keyTerms.join(', ')}`));
           }
           
           if (context.dependencies && context.dependencies.length > 0) {

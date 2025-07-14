@@ -2,7 +2,7 @@ export interface CrystallizedContext {
   filePath: string;
   relativePath: string;
   purpose: string;
-  keyAPIs: string[];
+  keyTerms: string[];
   dependencies: string[];
   patterns: string[];
   relatedContexts: string[];

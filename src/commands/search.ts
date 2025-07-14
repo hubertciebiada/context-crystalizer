@@ -38,8 +38,8 @@ export function createSearchCommand() {
           console.log(chalk.bold(`${index + 1}. ${match.file}`));
           console.log(chalk.gray(`   Category: ${match.category} | Complexity: ${match.complexity} | Relevance: ${(match.relevance * 100).toFixed(1)}%`));
           console.log(chalk.white(`   ${match.purpose}`));
-          if (match.keyAPIs.length > 0) {
-            console.log(chalk.blue(`   APIs: ${match.keyAPIs.join(', ')}`));
+          if (match.keyTerms.length > 0) {
+            console.log(chalk.blue(`   Terms: ${match.keyTerms.join(', ')}`));
           }
           if (match.highlights.length > 0) {
             console.log(chalk.yellow(`   Highlights: ${match.highlights.join(', ')}`));

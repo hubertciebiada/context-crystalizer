@@ -91,7 +91,7 @@ export class ContextSearch {
     
     // Build search query from context metadata
     const searchTerms = [
-      ...context.keyAPIs.slice(0, 3),
+      ...context.keyTerms.slice(0, 3),
       ...context.dependencies.slice(0, 3),
       ...context.patterns.slice(0, 2),
     ].join(' ');
@@ -152,9 +152,9 @@ export class ContextSearch {
       }
     }
     
-    // Check key APIs (high relevance)
-    if (metadata.keyAPIs) {
-      for (const api of metadata.keyAPIs) {
+    // Check key terms (high relevance)
+    if (metadata.keyTerms) {
+      for (const api of metadata.keyTerms) {
         const apiLower = api.toLowerCase();
         for (const term of queryTerms) {
           if (apiLower.includes(term)) {
@@ -190,7 +190,7 @@ export class ContextSearch {
     
     // Bonus for exact matches
     for (const term of queryTerms) {
-      if (pathLower === term || metadata.keyAPIs?.some((api: string) => api.toLowerCase() === term)) {
+      if (pathLower === term || metadata.keyTerms?.some((api: string) => api.toLowerCase() === term)) {
         score += 15;
       }
     }
@@ -216,11 +216,11 @@ export class ContextSearch {
     const queryTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 2);
     const highlights: string[] = [];
     
-    // Highlight matching APIs
-    for (const api of context.keyAPIs) {
+    // Highlight matching terms
+    for (const api of context.keyTerms) {
       for (const term of queryTerms) {
         if (api.toLowerCase().includes(term)) {
-          highlights.push(`API: ${api}`);
+          highlights.push(`Term: ${api}`);
           break;
         }
       }
@@ -291,7 +291,7 @@ export class ContextSearch {
     
     // Limit arrays if needed
     if (maxTokens < 100) {
-      truncated.keyAPIs = truncated.keyAPIs.slice(0, 3);
+      truncated.keyTerms = truncated.keyTerms.slice(0, 3);
       truncated.dependencies = truncated.dependencies.slice(0, 2);
       truncated.patterns = truncated.patterns.slice(0, 1);
     }
@@ -324,7 +324,7 @@ export class ContextSearch {
       filePath: relativePath, // Store only relative paths for portability
       relativePath,
       purpose: '',
-      keyAPIs: [],
+      keyTerms: [],
       dependencies: [],
       patterns: [],
       relatedContexts: [],
@@ -346,7 +346,7 @@ export class ContextSearch {
       if (title?.includes('purpose')) {
         context.purpose = lines.slice(1).join('\n').trim();
       } else if (title?.includes('key apis')) {
-        context.keyAPIs = lines.slice(1)
+        context.keyTerms = lines.slice(1)
           .filter(line => line.startsWith('- '))
           .map(line => line.substring(2));
       } else if (title?.includes('dependencies')) {

@@ -16,7 +16,7 @@ export class TemplateManager {
       maxTokens: 200,
       sections: [
         { name: 'purpose', required: true, maxTokens: 80, format: 'text' },
-        { name: 'keyAPIs', required: true, maxTokens: 60, format: 'list' },
+        { name: 'keyTerms', required: true, maxTokens: 60, format: 'list' },
         { name: 'dependencies', required: false, maxTokens: 40, format: 'list' },
         { name: 'relatedContexts', required: false, maxTokens: 20, format: 'list' },
       ],
@@ -28,7 +28,7 @@ export class TemplateManager {
       maxTokens: 2000,
       sections: [
         { name: 'purpose', required: true, maxTokens: 200, format: 'text' },
-        { name: 'keyAPIs', required: true, maxTokens: 400, format: 'list' },
+        { name: 'keyTerms', required: true, maxTokens: 400, format: 'list' },
         { name: 'dependencies', required: false, maxTokens: 200, format: 'list' },
         { name: 'patterns', required: false, maxTokens: 400, format: 'list' },
         { name: 'aiGuidance', required: false, maxTokens: 300, format: 'markdown' },
@@ -118,7 +118,7 @@ export class TemplateManager {
   private getSectionData(sectionName: string, context: CrystallizedContext): any {
     switch (sectionName) {
       case 'purpose': return context.purpose;
-      case 'keyAPIs': return context.keyAPIs;
+      case 'keyTerms': return context.keyTerms;
       case 'dependencies': return context.dependencies;
       case 'patterns': return context.patterns;
       case 'aiGuidance': return context.aiGuidance;
@@ -133,7 +133,7 @@ export class TemplateManager {
   private getSectionTitle(sectionName: string): string {
     const titles: Record<string, string> = {
       purpose: 'Purpose',
-      keyAPIs: 'Key APIs for AI',
+      keyTerms: 'Key Terms for Search',
       dependencies: 'Context Dependencies',
       patterns: 'AI Implementation Patterns',
       aiGuidance: 'AI Guidance',
