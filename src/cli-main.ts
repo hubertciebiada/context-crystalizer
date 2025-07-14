@@ -2,6 +2,9 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { createGuidanceCommand } from './commands/guidance.js';
 import { createInitCommand } from './commands/init.js';
 import { createProgressCommand } from './commands/progress.js';
@@ -11,13 +14,28 @@ import { createRelatedCommand } from './commands/related.js';
 import { createValidateCommand } from './commands/validate.js';
 import { createUpdateCommand } from './commands/update.js';
 import { createMcpCommand } from './commands/mcp.js';
+import { createVersionCommand } from './commands/version.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const program = new Command();
 
+// Read version from package.json
+async function getVersion(): Promise<string> {
+  try {
+    // From dist/cli-main.js, go up to project root
+    const packageJsonPath = path.resolve(__dirname, '..', 'package.json');
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
+    return packageJson.version;
+  } catch {
+    return '1.1.4'; // Fallback version
+  }
+}
+
 program
   .name('context-crystallizer')
-  .description('Transform large repositories into crystallized, AI-consumable knowledge')
-  .version('1.0.0');
+  .description('Transform large repositories into crystallized, AI-consumable knowledge');
 
 // Add all commands
 program.addCommand(createGuidanceCommand());
@@ -28,6 +46,7 @@ program.addCommand(createBundleCommand());
 program.addCommand(createRelatedCommand());
 program.addCommand(createValidateCommand());
 program.addCommand(createUpdateCommand());
+program.addCommand(createVersionCommand());
 program.addCommand(createMcpCommand());
 
 // Add help examples
@@ -42,6 +61,7 @@ Examples:
   ${chalk.cyan('context-crystallizer related src/auth.ts')}     Find related contexts
   ${chalk.cyan('context-crystallizer validate')}               Validate quality
   ${chalk.cyan('context-crystallizer update')}                 Update changed contexts
+  ${chalk.cyan('context-crystallizer version')}                Display version information
   ${chalk.cyan('context-crystallizer mcp')}                    Start MCP server
 
 For AI Agent Integration:
@@ -51,6 +71,10 @@ For AI Agent Integration:
 
 export async function runCli() {
   try {
+    // Set version dynamically
+    const version = await getVersion();
+    program.version(version);
+    
     await program.parseAsync(process.argv);
   } catch (error) {
     console.error(chalk.red('❌ Command failed:'));
