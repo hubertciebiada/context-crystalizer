@@ -49,6 +49,8 @@
       "mcp__context7__get-library-docs",
       "Bash(npm version:*)"
     ],
-    "deny": []
+    "deny": [
+      "Bash(npm publish:*)"
+    ]
   }
 }
