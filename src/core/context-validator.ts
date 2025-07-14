@@ -22,7 +22,7 @@ export class ContextValidator {
 
   constructor(repoPath: string) {
     this.repoPath = path.resolve(repoPath);
-    this.contextBasePath = path.join(this.repoPath, '.context-crystalizer');
+    this.contextBasePath = path.join(this.repoPath, '.context-crystallizer');
   }
 
   async validateContext(context: CrystallizedContext): Promise<ValidationResult> {

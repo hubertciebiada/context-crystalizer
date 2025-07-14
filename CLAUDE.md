@@ -48,11 +48,11 @@ AI-optimized context files follow this format:
 
 ### Project Structure
 ```
-context-crystalizer/
+context-crystallizer/
 ├── README.md              # Primary project documentation
 ├── .claude/               # Claude Code configuration
 ├── .taskmaster/           # Task management configuration
-└── .context-crystalizer/  # (Future) Crystallized knowledge base
+└── .context-crystallizer/  # (Future) Crystallized knowledge base
     ├── ai-index.md
     ├── context/
     └── ai-metadata/

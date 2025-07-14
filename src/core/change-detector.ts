@@ -44,7 +44,7 @@ export class ChangeDetector {
 
   constructor(repoPath: string) {
     this.repoPath = path.resolve(repoPath);
-    this.contextBasePath = path.join(this.repoPath, '.context-crystalizer');
+    this.contextBasePath = path.join(this.repoPath, '.context-crystallizer');
     this.manifestPath = path.join(this.contextBasePath, 'file-hash-manifest.json');
   }
 

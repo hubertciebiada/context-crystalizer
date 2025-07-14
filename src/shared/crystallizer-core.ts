@@ -64,7 +64,7 @@ export class CrystallizerCore {
   }
 
   private async createTemplateFiles(repoPath: string): Promise<void> {
-    const templatesDir = path.join(repoPath, '.context-crystalizer', 'templates');
+    const templatesDir = path.join(repoPath, '.context-crystallizer', 'templates');
     await fs.mkdir(templatesDir, { recursive: true });
 
     // Define template files to copy
@@ -157,7 +157,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   private async createTimeoutConfigFile(repoPath: string): Promise<void> {
-    const timeoutConfigPath = path.join(repoPath, '.context-crystalizer', 'crystallization_timeout.txt');
+    const timeoutConfigPath = path.join(repoPath, '.context-crystallizer', 'crystallization_timeout.txt');
     
     // Only create if it doesn't exist (don't overwrite user customizations)
     try {
@@ -403,7 +403,7 @@ Focus on comprehensive understanding for complex files.`;
       throw new Error('Repository path not available. Ensure repository is initialized or provide repoPath parameter.');
     }
 
-    const templatesDir = path.join(targetRepoPath, '.context-crystalizer', 'templates');
+    const templatesDir = path.join(targetRepoPath, '.context-crystallizer', 'templates');
     
     // Load templates from files
     const templates = await this.loadTemplatesFromFiles(templatesDir);

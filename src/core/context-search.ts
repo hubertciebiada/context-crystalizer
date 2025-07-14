@@ -9,7 +9,7 @@ export class ContextSearch {
 
   constructor(repoPath: string) {
     this.repoPath = path.resolve(repoPath);
-    this.contextBasePath = path.join(this.repoPath, '.context-crystalizer');
+    this.contextBasePath = path.join(this.repoPath, '.context-crystallizer');
   }
 
   async searchContexts(query: string, maxTokens: number = 4000, category?: string): Promise<SearchResult[]> {

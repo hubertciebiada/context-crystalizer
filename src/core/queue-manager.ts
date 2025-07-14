@@ -26,8 +26,8 @@ export class QueueManager {
   async initializeQueue(files: FileQueueItem[], repoPath: string, excludePatterns: string[] = []): Promise<void> {
     this.repoPath = repoPath;
     this.excludePatterns = excludePatterns;
-    this.queueStatePath = path.join(repoPath, '.context-crystalizer', 'processing-queue.json');
-    this.claimsPath = path.join(repoPath, '.context-crystalizer', 'file-claims.json');
+    this.queueStatePath = path.join(repoPath, '.context-crystallizer', 'processing-queue.json');
+    this.claimsPath = path.join(repoPath, '.context-crystallizer', 'file-claims.json');
     
     // Load timeout configuration
     await this.loadTimeoutConfig();
@@ -138,7 +138,7 @@ export class QueueManager {
 
   async tryRecoverSession(repoPath: string, excludePatterns: string[]): Promise<boolean> {
     try {
-      const queueStatePath = path.join(repoPath, '.context-crystalizer', 'processing-queue.json');
+      const queueStatePath = path.join(repoPath, '.context-crystallizer', 'processing-queue.json');
       const stateContent = await fs.readFile(queueStatePath, 'utf-8');
       const state: QueueState = JSON.parse(stateContent);
       
@@ -227,7 +227,7 @@ export class QueueManager {
   private async loadTimeoutConfig(): Promise<void> {
     if (!this.repoPath) return;
     
-    const timeoutConfigPath = path.join(this.repoPath, '.context-crystalizer', 'crystallization_timeout.txt');
+    const timeoutConfigPath = path.join(this.repoPath, '.context-crystallizer', 'crystallization_timeout.txt');
     
     try {
       const content = await fs.readFile(timeoutConfigPath, 'utf-8');
