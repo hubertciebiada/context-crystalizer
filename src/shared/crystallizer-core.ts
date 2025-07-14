@@ -257,7 +257,7 @@ Focus on comprehensive understanding for complex files.`;
         tokens: r.context.tokenCount,
         highlights: r.highlights,
         purpose: `${r.context.purpose.substring(0, 150)}...`,
-        keyTerms: r.context.keyTerms.slice(0, 3),
+        keyTerms: r.context.keyTerms,
       })),
     };
   }
@@ -300,7 +300,7 @@ Focus on comprehensive understanding for complex files.`;
         relevance: r.relevanceScore,
         category: r.context.category,
         purpose: `${r.context.purpose.substring(0, 100)}...`,
-        keyTerms: r.context.keyTerms.slice(0, 2),
+        keyTerms: r.context.keyTerms,
         relationship: r.highlights.join(', '),
       })),
     };
@@ -319,7 +319,7 @@ Focus on comprehensive understanding for complex files.`;
         file: r.context.relativePath,
         category: r.context.category,
         purpose: `${r.context.purpose.substring(0, 100)}...`,
-        keyTerms: r.context.keyTerms.slice(0, 3),
+        keyTerms: r.context.keyTerms,
         tokenCount: r.context.tokenCount,
       })),
     };
