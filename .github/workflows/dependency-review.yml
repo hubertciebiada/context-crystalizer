@@ -83,6 +83,7 @@ jobs:
   license-check:
     name: License Compliance
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     
     steps:
     - name: Checkout code
@@ -161,6 +162,31 @@ jobs:
           echo "changes=false" >> $GITHUB_OUTPUT
           echo "✅ No dependency updates needed"
         fi
+        
+    - name: Install license checker
+      if: steps.changes.outputs.changes == 'true'
+      run: npm install -g license-checker
+      
+    - name: Check updated licenses
+      if: steps.changes.outputs.changes == 'true'
+      run: |
+        echo "📄 Checking licenses after dependency updates..."
+        license-checker --json --excludePrivatePackages > licenses.json
+        
+        # Check for problematic licenses
+        PROBLEMATIC_LICENSES=("GPL-2.0" "GPL-3.0" "AGPL-1.0" "AGPL-3.0" "LGPL-2.1" "LGPL-3.0")
+        
+        echo "🔍 Scanning updated dependencies for problematic licenses..."
+        for license in "${PROBLEMATIC_LICENSES[@]}"; do
+          if cat licenses.json | jq -r '.[] | select(.licenses | contains("'"$license"'")) | keys[]' | head -1; then
+            echo "❌ Found problematic license after update: $license"
+            cat licenses.json | jq -r '.[] | select(.licenses | contains("'"$license"'"))'
+            echo "::error::Dependency update introduced problematic license: $license"
+            exit 1
+          fi
+        done
+        
+        echo "✅ All updated dependencies have compliant licenses"
         
     - name: Create Pull Request
       if: steps.changes.outputs.changes == 'true'
