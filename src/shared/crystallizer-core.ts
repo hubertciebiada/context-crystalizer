@@ -83,6 +83,27 @@ export class CrystallizerCore {
     return false;
   }
 
+  private async ensureInitialized(repoPath?: string): Promise<void> {
+    // If already initialized, nothing to do
+    if (this.contextSearch && this.contextStorage && this.queueManager) {
+      return;
+    }
+
+    // Use provided path or current working directory
+    const targetPath = repoPath || process.cwd();
+    
+    // Check if repository has existing crystallization
+    const hasExistingCrystallization = await this.isAlreadyInitialized(targetPath);
+    
+    if (!hasExistingCrystallization) {
+      throw new Error(`No crystallization found in ${targetPath}. Please run init_crystallization first to set up the repository.`);
+    }
+
+    // Auto-initialize components for existing crystallization
+    console.error(`🔄 Auto-initializing components for existing crystallization in ${targetPath}`);
+    await this.initializeComponents(targetPath, ['node_modules', '.git', 'dist', 'build']);
+  }
+
   private async ensureInfrastructure(repoPath: string): Promise<void> {
     // Create directory structure if missing
     const baseDir = path.join(repoPath, '.context-crystallizer');
@@ -234,9 +255,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async getNextFileForCrystallization() {
-    if (!this.queueManager || !this.fileScanner) {
-      throw new Error('Repository not initialized. Run init_crystallization first.');
-    }
+    await this.ensureInitialized();
 
     const nextFile = await this.queueManager.getNextFile();
     if (!nextFile) {
@@ -260,9 +279,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async storeCrystallizedContext(filePath: string, context: CrystallizerContext, fileContent?: string, fileMetadata?: Partial<FileMetadata>) {
-    if (!this.contextStorage || !this.queueManager) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     // Convert partial metadata to complete metadata if provided
     const completeMetadata = fileMetadata ? {
@@ -286,9 +303,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async getCrystallizationProgress() {
-    if (!this.queueManager || !this.contextStorage) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     const progress = this.queueManager.getProgress();
     const stats = await this.contextStorage.getContextStatistics();
@@ -304,9 +319,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async searchCrystallizedContexts(query: string, maxTokens: number = 4000, category?: string) {
-    if (!this.contextSearch) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     const results = await this.contextSearch.searchContexts(query, maxTokens, category);
     return {
@@ -327,9 +340,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async getCrystallizedBundle(files: string[], maxTokens: number = 8000) {
-    if (!this.contextSearch) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     const bundle = await this.contextSearch.getContextBundle(files, maxTokens);
     return {
@@ -351,9 +362,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async findRelatedCrystallizedContexts(filePath: string, maxResults: number = 5) {
-    if (!this.contextSearch) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     const results = await this.contextSearch.findRelatedContexts(filePath, maxResults);
     return {
@@ -371,9 +380,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async searchByComplexity(complexity: 'low' | 'medium' | 'high', maxResults: number = 10) {
-    if (!this.contextSearch) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     const results = await this.contextSearch.searchByComplexity(complexity, maxResults);
     return {
@@ -390,9 +397,7 @@ Focus on comprehensive understanding for complex files.`;
   }
 
   async validateCrystallizationQuality(filePath?: string, generateReport: boolean = false) {
-    if (!this.contextValidator) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     if (generateReport) {
       const report = await this.contextValidator.generateProjectQualityReport();
@@ -425,9 +430,7 @@ Focus on comprehensive understanding for complex files.`;
     checkOnly?: boolean;
     generateReport?: boolean;
   } = {}) {
-    if (!this.contextUpdater) {
-      throw new Error('Repository not initialized.');
-    }
+    await this.ensureInitialized();
 
     const {
       forceUpdate = false,
