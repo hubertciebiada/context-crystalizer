@@ -286,12 +286,9 @@ export class ContextStorage {
           lines.push(`- ${complexityBadge} [${ctx.relativePath}](${contextPath})${tokenInfo}`);
           
           if (ctx.keyTerms?.length > 0) {
-            ctx.keyTerms.slice(0, 5).forEach((term: string) => {
+            ctx.keyTerms.forEach((term: string) => {
               lines.push(`  - ${term}`);
             });
-            if (ctx.keyTerms.length > 5) {
-              lines.push(`  - ...and ${ctx.keyTerms.length - 5} more`);
-            }
           }
         });
         lines.push('');

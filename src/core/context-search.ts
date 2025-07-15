@@ -289,12 +289,7 @@ export class ContextSearch {
       truncated.purpose = TokenCounter.truncateToTokenLimit(truncated.purpose, Math.max(50, maxTokens - 50));
     }
     
-    // Limit arrays if needed
-    if (maxTokens < 100) {
-      truncated.keyTerms = truncated.keyTerms.slice(0, 3);
-      truncated.dependencies = truncated.dependencies.slice(0, 2);
-      truncated.patterns = truncated.patterns.slice(0, 1);
-    }
+    // Note: Arrays are no longer truncated to preserve full context for AI tools
     
     truncated.tokenCount = maxTokens;
     return truncated;
