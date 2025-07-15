@@ -271,8 +271,15 @@ export class QueueManager {
 
   private async releaseClaim(filePath: string): Promise<void> {
     const claims = await this.loadClaims();
+    const hadClaim = filePath in claims;
     delete claims[filePath];
     await this.saveClaims(claims);
+    
+    if (hadClaim) {
+      console.error(`✓ Released claim for: ${filePath}`);
+    } else {
+      console.error(`⚠ No claim to release for: ${filePath}`);
+    }
   }
 
   private async isFileClaimed(filePath: string): Promise<boolean> {
