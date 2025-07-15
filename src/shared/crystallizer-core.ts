@@ -257,12 +257,12 @@ Focus on comprehensive understanding for complex files.`;
   async getNextFileForCrystallization() {
     await this.ensureInitialized();
 
-    const nextFile = await this.queueManager.getNextFile();
+    const nextFile = await this.queueManager!.getNextFile();
     if (!nextFile) {
       return null; // No more files to crystallize
     }
 
-    const content = await this.fileScanner.readFile(nextFile.path);
+    const content = await this.fileScanner!.readFile(nextFile.path);
     return {
       path: nextFile.path,
       relativePath: nextFile.relativePath,
@@ -288,13 +288,13 @@ Focus on comprehensive understanding for complex files.`;
     } : undefined;
 
     try {
-      await this.contextStorage.storeContext(filePath, context, fileContent, completeMetadata);
+      await this.contextStorage!.storeContext(filePath, context, fileContent, completeMetadata);
     } finally {
       // Always release file claim, even if storage fails
-      await this.queueManager.markProcessed(filePath);
+      await this.queueManager!.markProcessed(filePath);
     }
 
-    const stats = await this.contextStorage.getContextStatistics();
+    const stats = await this.contextStorage!.getContextStatistics();
     return {
       filePath,
       totalContexts: stats.totalContexts,
@@ -305,9 +305,9 @@ Focus on comprehensive understanding for complex files.`;
   async getCrystallizationProgress() {
     await this.ensureInitialized();
 
-    const progress = this.queueManager.getProgress();
-    const stats = await this.contextStorage.getContextStatistics();
-    const sessionInfo = this.queueManager.getSessionInfo();
+    const progress = this.queueManager!.getProgress();
+    const stats = await this.contextStorage!.getContextStatistics();
+    const sessionInfo = this.queueManager!.getSessionInfo();
 
     return {
       ...progress,
@@ -321,7 +321,7 @@ Focus on comprehensive understanding for complex files.`;
   async searchCrystallizedContexts(query: string, maxTokens: number = 4000, category?: string) {
     await this.ensureInitialized();
 
-    const results = await this.contextSearch.searchContexts(query, maxTokens, category);
+    const results = await this.contextSearch!.searchContexts(query, maxTokens, category);
     return {
       query,
       results: results.length,
@@ -342,7 +342,7 @@ Focus on comprehensive understanding for complex files.`;
   async getCrystallizedBundle(files: string[], maxTokens: number = 8000) {
     await this.ensureInitialized();
 
-    const bundle = await this.contextSearch.getContextBundle(files, maxTokens);
+    const bundle = await this.contextSearch!.getContextBundle(files, maxTokens);
     return {
       requestedFiles: files.length,
       includedFiles: bundle.contexts.length,
@@ -364,7 +364,7 @@ Focus on comprehensive understanding for complex files.`;
   async findRelatedCrystallizedContexts(filePath: string, maxResults: number = 5) {
     await this.ensureInitialized();
 
-    const results = await this.contextSearch.findRelatedContexts(filePath, maxResults);
+    const results = await this.contextSearch!.findRelatedContexts(filePath, maxResults);
     return {
       sourceFile: filePath,
       relatedContexts: results.length,
@@ -382,7 +382,7 @@ Focus on comprehensive understanding for complex files.`;
   async searchByComplexity(complexity: 'low' | 'medium' | 'high', maxResults: number = 10) {
     await this.ensureInitialized();
 
-    const results = await this.contextSearch.searchByComplexity(complexity, maxResults);
+    const results = await this.contextSearch!.searchByComplexity(complexity, maxResults);
     return {
       complexity,
       totalFound: results.length,
@@ -400,7 +400,7 @@ Focus on comprehensive understanding for complex files.`;
     await this.ensureInitialized();
 
     if (generateReport) {
-      const report = await this.contextValidator.generateProjectQualityReport();
+      const report = await this.contextValidator!.generateProjectQualityReport();
       return {
         type: 'project_quality_report',
         ...report,
@@ -412,7 +412,7 @@ Focus on comprehensive understanding for complex files.`;
         throw new Error(`Context not found for ${filePath}`);
       }
 
-      const validation = await this.contextValidator.validateContext(context);
+      const validation = await this.contextValidator!.validateContext(context);
       return {
         type: 'context_validation',
         file: filePath,
@@ -441,12 +441,12 @@ Focus on comprehensive understanding for complex files.`;
     } = options;
 
     if (generateReport) {
-      const report = await this.contextUpdater.generateUpdateReport();
+      const report = await this.contextUpdater!.generateUpdateReport();
       return { type: 'update_report', report };
     }
 
     if (checkOnly) {
-      const status = await this.contextUpdater.getUpdateStatus();
+      const status = await this.contextUpdater!.getUpdateStatus();
       return {
         type: 'update_status',
         ...status,
@@ -454,7 +454,7 @@ Focus on comprehensive understanding for complex files.`;
     }
 
     // Perform the update
-    const updateResult = await this.contextUpdater.updateContexts({
+    const updateResult = await this.contextUpdater!.updateContexts({
       forceUpdate,
       includeUnchanged,
       cleanupDeleted,
