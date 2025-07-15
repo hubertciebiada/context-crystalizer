@@ -46,7 +46,7 @@ export class CrystallizerCore {
       console.error('📋 Existing crystallization detected - preserving analysis and index');
       
       // Ensure infrastructure files exist, but don't overwrite analysis
-      await this.ensureInfrastructure(repoPath, exclude);
+      await this.ensureInfrastructure(repoPath);
       
       // Initialize components to work with existing data
       await this.initializeComponents(repoPath, exclude);
@@ -83,7 +83,7 @@ export class CrystallizerCore {
     return false;
   }
 
-  private async ensureInfrastructure(repoPath: string, exclude: string[]): Promise<void> {
+  private async ensureInfrastructure(repoPath: string): Promise<void> {
     // Create directory structure if missing
     const baseDir = path.join(repoPath, '.context-crystallizer');
     await fs.mkdir(baseDir, { recursive: true });
