@@ -39,6 +39,65 @@ export class CrystallizerCore {
   private contextUpdater?: ContextUpdater;
 
   async initializeCrystallization(repoPath: string, exclude: string[] = ['node_modules', '.git', 'dist', 'build']) {
+    // Check if crystallization already exists
+    const alreadyInitialized = await this.isAlreadyInitialized(repoPath);
+    
+    if (alreadyInitialized) {
+      console.error('📋 Existing crystallization detected - preserving analysis and index');
+      
+      // Ensure infrastructure files exist, but don't overwrite analysis
+      await this.ensureInfrastructure(repoPath, exclude);
+      
+      // Initialize components to work with existing data
+      await this.initializeComponents(repoPath, exclude);
+      
+      // Get current queue status
+      const queueStatus = this.queueManager?.getProgress();
+      const filesQueued = queueStatus?.totalFiles || 0;
+      
+      console.error(`✓ Reinitialized with ${filesQueued} files (${queueStatus?.processedFiles || 0} already processed)`);
+      return { filesQueued, reinitialized: true };
+    } else {
+      console.error('🆕 Fresh crystallization initialization');
+      return await this.performFreshInitialization(repoPath, exclude);
+    }
+  }
+
+  private async isAlreadyInitialized(repoPath: string): Promise<boolean> {
+    const criticalPaths = [
+      path.join(repoPath, '.context-crystallizer', 'ai-index.md'),
+      path.join(repoPath, '.context-crystallizer', 'context'),
+      path.join(repoPath, '.context-crystallizer', 'ai-metadata'),
+    ];
+    
+    // Check if any critical crystallization files exist
+    for (const criticalPath of criticalPaths) {
+      try {
+        await fs.access(criticalPath);
+        return true; // Found existing crystallization
+      } catch {
+        // Continue checking other paths
+      }
+    }
+    
+    return false;
+  }
+
+  private async ensureInfrastructure(repoPath: string, exclude: string[]): Promise<void> {
+    // Create directory structure if missing
+    const baseDir = path.join(repoPath, '.context-crystallizer');
+    await fs.mkdir(baseDir, { recursive: true });
+    await fs.mkdir(path.join(baseDir, 'context'), { recursive: true });
+    await fs.mkdir(path.join(baseDir, 'ai-metadata'), { recursive: true });
+    
+    // Create template files (already protected against overwrite)
+    await this.createTemplateFiles(repoPath);
+    
+    // Create timeout configuration (already protected against overwrite)
+    await this.createTimeoutConfigFile(repoPath);
+  }
+
+  private async initializeComponents(repoPath: string, exclude: string[]): Promise<void> {
     this.fileScanner = new FileScanner(repoPath, exclude);
     this.contextStorage = new ContextStorage(repoPath);
     this.queueManager = new QueueManager();
@@ -47,20 +106,25 @@ export class CrystallizerCore {
     this.changeDetector = new ChangeDetector(repoPath);
     this.contextUpdater = new ContextUpdater(repoPath, this.fileScanner, this.contextStorage, this.changeDetector, this.queueManager);
 
+    // Initialize queue with session recovery (preserves existing state)
     const files = await this.fileScanner.scanRepository();
     await this.queueManager.initializeQueue(files, repoPath, exclude);
     
-    // Initialize context storage with all file paths
+    // Initialize context storage with all file paths (safe for existing data)
     const allFilePaths = files.map(f => f.path);
     await this.contextStorage.initialize(allFilePaths);
+  }
 
-    // Create template files for user customization
-    await this.createTemplateFiles(repoPath);
+  private async performFreshInitialization(repoPath: string, exclude: string[]): Promise<{ filesQueued: number; reinitialized?: boolean }> {
+    // Initialize components for fresh setup
+    await this.initializeComponents(repoPath, exclude);
 
-    // Create timeout configuration file for concurrent agent support
-    await this.createTimeoutConfigFile(repoPath);
-
-    return { filesQueued: files.length };
+    // Get queue status after fresh initialization
+    const queueStatus = this.queueManager?.getProgress();
+    const filesQueued = queueStatus?.totalFiles || 0;
+    
+    console.error(`✓ Fresh initialization complete with ${filesQueued} files to process`);
+    return { filesQueued };
   }
 
   private async createTemplateFiles(repoPath: string): Promise<void> {
