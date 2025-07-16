@@ -10,21 +10,33 @@ export class TemplateManager {
   }
 
   private initializeTemplates(): void {
-    // Short template for quick crystallized context (max 200 tokens)
-    this.templates.set('short', {
-      name: 'short',
-      maxTokens: 200,
+    // Overview template for ultra-compact analysis (max 50 tokens)
+    this.templates.set('overview', {
+      name: 'overview',
+      maxTokens: 50,
       sections: [
-        { name: 'purpose', required: true, maxTokens: 80, format: 'text' },
-        { name: 'keyTerms', required: true, maxTokens: 60, format: 'list' },
-        { name: 'dependencies', required: false, maxTokens: 40, format: 'list' },
-        { name: 'relatedContexts', required: false, maxTokens: 20, format: 'list' },
+        { name: 'purpose', required: true, maxTokens: 20, format: 'text' },
+        { name: 'keyTerms', required: true, maxTokens: 25, format: 'list' },
+        { name: 'category', required: true, maxTokens: 5, format: 'text' },
       ],
     });
 
-    // Extended template for detailed crystallized context (max 2000 tokens)
-    this.templates.set('extended', {
-      name: 'extended',
+    // Standard template for regular analysis (max 200 tokens)
+    this.templates.set('standard', {
+      name: 'standard',
+      maxTokens: 200,
+      sections: [
+        { name: 'purpose', required: true, maxTokens: 55, format: 'text' },
+        { name: 'keyTerms', required: true, maxTokens: 45, format: 'list' },
+        { name: 'dependencies', required: false, maxTokens: 30, format: 'list' },
+        { name: 'patterns', required: false, maxTokens: 40, format: 'list' },
+        { name: 'relatedContexts', required: false, maxTokens: 30, format: 'list' },
+      ],
+    });
+
+    // Detailed template for comprehensive analysis (max 2000 tokens)
+    this.templates.set('detailed', {
+      name: 'detailed',
       maxTokens: 2000,
       sections: [
         { name: 'purpose', required: true, maxTokens: 200, format: 'text' },
@@ -45,7 +57,7 @@ export class TemplateManager {
   }
 
   generateContextMarkdown(context: CrystallizedContext): string {
-    const template = this.getTemplate(context.template) || this.getTemplate('short')!;
+    const template = this.getTemplate(context.template) || this.getTemplate('standard')!;
     const lines: string[] = [];
 
     // Header
@@ -57,10 +69,8 @@ export class TemplateManager {
     lines.push(`<!-- Template: ${context.template} -->`);
     lines.push(`<!-- Category: ${context.category} -->`);
     lines.push(`<!-- Complexity: ${context.complexity} -->`);
+    lines.push(`<!-- Tokens: ${context.tokenCount || 0} -->`);
     lines.push(`<!-- Generated: ${context.lastModified.toISOString()} -->`);
-    if (context.tokenCount) {
-      lines.push(`<!-- Tokens: ${context.tokenCount} -->`);
-    }
     lines.push('');
 
     // Generate sections based on template
@@ -73,20 +83,21 @@ export class TemplateManager {
     }
 
     // Footer with references
-    if (context.crossReferences.length > 0) {
+    if (context.crossReferences && context.crossReferences.length > 0) {
       lines.push('## Cross References');
       context.crossReferences.forEach(ref => {
-        const desc = ref.description ? ` - ${ref.description}` : '';
-        lines.push(`- **${ref.type}**: \`${ref.target}\`${desc}`);
+        // Ensure ref is an object and has required properties
+        if (ref && typeof ref === 'object' && ref.type && ref.target) {
+          const desc = ref.description ? ` - ${ref.description}` : '';
+          lines.push(`- **${ref.type}**: \`${ref.target}\`${desc}`);
+        }
       });
       lines.push('');
     }
 
     lines.push('---');
     lines.push(`*Last updated: ${context.lastModified.toISOString()}*`);
-    if (context.tokenCount) {
-      lines.push(`*Token count: ${context.tokenCount}*`);
-    }
+    lines.push(`*Token count: ${context.tokenCount || 0}*`);
 
     const markdown = lines.join('\n');
     
@@ -126,6 +137,8 @@ export class TemplateManager {
       case 'integrationPoints': return context.integrationPoints;
       case 'crossReferences': return context.crossReferences;
       case 'relatedContexts': return context.relatedContexts;
+      case 'category': return context.category;
+      case 'complexity': return context.complexity;
       default: return null;
     }
   }
@@ -133,14 +146,16 @@ export class TemplateManager {
   private getSectionTitle(sectionName: string): string {
     const titles: Record<string, string> = {
       purpose: 'Purpose',
-      keyTerms: 'Key Terms for Search',
-      dependencies: 'Context Dependencies',
-      patterns: 'AI Implementation Patterns',
+      keyTerms: 'Key Terms',
+      dependencies: 'Dependencies',
+      patterns: 'Patterns',
       aiGuidance: 'AI Guidance',
       errorHandling: 'Error Handling',
       integrationPoints: 'Integration Points',
       crossReferences: 'Cross References',
       relatedContexts: 'Related Contexts',
+      category: 'Category',
+      complexity: 'Complexity',
     };
     return titles[sectionName] || sectionName;
   }
@@ -184,18 +199,24 @@ export class TemplateManager {
     complexity: 'low' | 'medium' | 'high', 
     category: 'config' | 'source' | 'test' | 'docs' | 'other',
     estimatedTokens: number
-  ): 'short' | 'extended' {
-    // Use extended template for:
+  ): 'overview' | 'standard' | 'detailed' {
+    // Use detailed template for:
     // - High complexity files
-    // - Source files that are medium/high complexity
+    // - Source files that are medium/high complexity  
     // - Files with many estimated tokens (likely complex)
     if (complexity === 'high' || 
         (category === 'source' && complexity === 'medium') ||
         estimatedTokens > 2000) {
-      return 'extended';
+      return 'detailed';
     }
     
-    return 'short';
+    // Use standard template for most files
+    if (complexity === 'medium' || category === 'source' || estimatedTokens > 500) {
+      return 'standard';
+    }
+    
+    // Use overview template for simple files
+    return 'overview';
   }
 
   validateContext(context: CrystallizedContext): { isValid: boolean; errors: string[] } {

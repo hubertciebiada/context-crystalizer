@@ -190,12 +190,12 @@ export class ContextValidator {
       score -= 20;
     }
     
-    if (context.template === 'extended') {
+    if (context.template === 'detailed') {
       if (!context.aiGuidance) {
         issues.push({
           severity: 'warning',
           category: 'completeness',
-          message: 'Extended template should include AI guidance',
+          message: 'Detailed template should include AI guidance',
           field: 'aiGuidance',
         });
         score -= 15;
@@ -301,7 +301,7 @@ export class ContextValidator {
     if (!context.tokenCount) return 50; // Unknown efficiency
     
     const template = context.template;
-    const maxTokens = template === 'short' ? 200 : 2000;
+    const maxTokens = template === 'overview' ? 50 : template === 'standard' ? 200 : 2000;
     const efficiency = (context.tokenCount / maxTokens) * 100;
     
     if (efficiency > 120) {
@@ -476,7 +476,7 @@ export class ContextValidator {
       patterns: [],
       relatedContexts: [],
       lastModified: new Date(),
-      template: (templateMatch?.[1] as 'short' | 'extended') || 'short',
+      template: (templateMatch?.[1] as 'overview' | 'standard' | 'detailed') || 'standard',
       complexity: (complexityMatch?.[1] as 'low' | 'medium' | 'high') || 'medium',
       category: (categoryMatch?.[1] as 'config' | 'source' | 'test' | 'docs' | 'other') || 'other',
       crossReferences: [],
@@ -492,7 +492,7 @@ export class ContextValidator {
       
       if (title?.includes('purpose')) {
         context.purpose = lines.slice(1).join('\n').trim();
-      } else if (title?.includes('key apis')) {
+      } else if (title?.includes('key terms')) {
         context.keyTerms = lines.slice(1)
           .filter(line => line.startsWith('- '))
           .map(line => line.substring(2));

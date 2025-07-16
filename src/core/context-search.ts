@@ -324,7 +324,7 @@ export class ContextSearch {
       patterns: [],
       relatedContexts: [],
       lastModified: new Date(),
-      template: (templateMatch?.[1] as 'short' | 'extended') || 'short',
+      template: (templateMatch?.[1] as 'overview' | 'standard' | 'detailed') || 'standard',
       complexity: (complexityMatch?.[1] as 'low' | 'medium' | 'high') || 'medium',
       category: (categoryMatch?.[1] as 'config' | 'source' | 'test' | 'docs' | 'other') || 'other',
       crossReferences: [],

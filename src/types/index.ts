@@ -8,7 +8,7 @@ export interface CrystallizedContext {
   relatedContexts: string[];
   lastModified: Date;
   tokenCount?: number;
-  template: 'short' | 'extended';
+  template: 'overview' | 'standard' | 'detailed';
   complexity: 'low' | 'medium' | 'high';
   category: 'config' | 'source' | 'test' | 'docs' | 'other';
   crossReferences: CrossReference[];
