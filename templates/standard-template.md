@@ -5,16 +5,21 @@
 ## Required Fields
 
 ### purpose (required)
-- **Max tokens**: 60
+- **Max tokens**: 55
 - **Format**: 2-3 sentences describing file's role and functionality
 - **Focus**: What it does, why it exists, how it fits in the system
 - **Example**: "React component for user authentication forms. Handles login, signup, and password reset flows. Integrates with authentication context and validates user input."
 
-### keyAPIs (required)
-- **Max tokens**: 40
-- **Format**: Array of key functions, classes, exports, or API endpoints
-- **Focus**: Entry points that other code would use or call
-- **Example**: ["LoginForm", "SignupForm", "validateEmail", "handleSubmit", "useAuth"]
+### keyTerms (required)
+- **Max tokens**: 45
+- **Format**: Array of searchable keywords, technologies, patterns, concepts (use FULL words)
+- **Focus**: Terms that AI agents would search for to find this file
+- **Storage**: Full terms stored in metadata - system auto-abbreviates for index display only
+- **Priority**: Critical for compact index - these become the primary search mechanism
+- **Ordering**: **ESSENTIAL** - Order from most important to least important (index shows first 8 terms)
+- **Include**: Technologies, frameworks, domain concepts, main functions, patterns
+- **Example**: ["authentication", "react", "forms", "validation", "hooks", "login", "signup", "ui"] (auth most critical)
+- **Note**: Use "authentication" not "auth", "configuration" not "config" - abbreviation is automatic
 
 ## Optional Fields
 
@@ -46,10 +51,12 @@
 ## Analysis Guidelines
 
 1. **Extract essentials**: Focus on information useful for AI understanding
-2. **Be specific**: Use actual function names, not generic descriptions
+2. **Be specific**: Use actual function names, not generic descriptions  
 3. **Think integration**: How would other code interact with this file?
-4. **Prioritize APIs**: What can other files call or import from here?
-5. **Include patterns**: What architectural decisions were made?
+4. **Optimize for search**: keyTerms are compressed and indexed - choose terms AI agents would search for
+5. **Prioritize keyTerms**: Order terms by importance - most critical terms first (index may truncate)
+6. **Include patterns**: What architectural decisions were made?
+7. **Consider compression**: Common terms get abbreviated (authentication→auth, database→db)
 
 ## When to Use
 - **Config files**: Package.json, tsconfig, environment files
@@ -61,7 +68,7 @@
 ```json
 {
   "purpose": "React component for user authentication forms. Handles login, signup, and password reset flows with validation.",
-  "keyAPIs": ["LoginForm", "SignupForm", "validateEmail", "handleSubmit"],
+  "keyTerms": ["react", "authentication", "forms", "validation", "hooks", "login", "signup"],
   "dependencies": ["react", "formik", "../hooks/useAuth"],
   "patterns": ["React hooks pattern", "Form validation", "Context API"],
   "relatedContexts": ["hooks/useAuth.ts", "contexts/AuthContext.tsx"],

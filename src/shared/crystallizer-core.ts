@@ -498,7 +498,7 @@ Focus on comprehensive understanding for complex files.`;
       
       analysisMethodology: {
         step1: "Read and understand the file's primary purpose and role in the system",
-        step2: "Identify key terms, concepts, entities, functions, and important elements",
+        step2: "Extract keyTerms: searchable keywords using FULL words (not abbreviations) - order by importance (most critical first) - system will auto-abbreviate for index display",
         step3: "Map important dependencies and relationships to other files",
         step4: "Recognize implementation patterns, architectural decisions, and conventions",
         step5: "Extract AI-specific guidance for working with or modifying this code",
@@ -509,13 +509,25 @@ Focus on comprehensive understanding for complex files.`;
       qualityStandards: [
         "Focus on functionality over implementation details",
         "Prioritize information useful for AI agents and search",
+        "Order keyTerms by importance - most critical search terms first",
         "Use consistent terminology across all analyses",
         "Include cross-references to related files when relevant",
         "Maintain token efficiency while preserving essential clarity",
         "Extract searchable keywords and functional descriptions"
       ],
       
-      indexingNote: "All crystallized knowledge is automatically indexed for semantic search. Focus on extracting searchable keywords, functional descriptions, and relationships that would help AI agents locate relevant code.",
+      compactIndexFormat: {
+        purpose: "Your analysis feeds into a compact AI index for fast searching",
+        format: "🔴 [full/file/path.ext](./context/path.context.md) (tokens) auth,config,db",
+        twoStageProcess: "Stage 1: You provide full keyTerms ordered by importance (authentication, configuration, database). Stage 2: System automatically abbreviates them in index display only (auth, config, db)",
+        fileAccess: "Full file paths preserved so AI tools can open files correctly",
+        sorting: "Files sorted by complexity (high→medium→low) then token count", 
+        compression: "keyTerms automatically abbreviated in index: authentication→auth, database→db, configuration→config, middleware→mw, management→mgmt, application→app, endpoint→ep, service→svc",
+        termPrioritization: "Order keyTerms by importance - most critical first (index may truncate to first 8 terms)",
+        searchability: "Use full words in keyTerms - abbreviation happens automatically for compact display"
+      },
+
+      indexingNote: "All crystallized knowledge is automatically indexed in a compact AI-optimized format. Your full keyTerms get automatically abbreviated in the index as: '🔴 [full/file/path.ext](link) (tokens) auth,config,db'. IMPORTANT: Always use full words in keyTerms (authentication, configuration, database) ordered by importance (most critical first) - the system handles abbreviation automatically for index display. File paths are preserved for AI tool access.",
       
       expectation: "Analyze files systematically and thoroughly. Each analysis contributes to the repository's searchable knowledge base. Maintain consistency and quality across all analyses. Generate overview analysis for every file to ensure complete search coverage. CRITICAL: Complete the full crystallization process - do not stop until all files are processed. Partial crystallization significantly reduces search effectiveness and knowledge base quality.",
       

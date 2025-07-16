@@ -10,12 +10,16 @@
 - **Focus**: What it does, why it's important, how it fits in the larger system
 - **Include**: Main responsibilities, key behaviors, architectural significance
 
-### keyAPIs (required)
+### keyTerms (required)
 - **Max tokens**: 400
-- **Format**: Detailed array of functions, classes, methods, endpoints with brief descriptions
-- **Focus**: All public interfaces, main entry points, important internal functions
-- **Include**: Function signatures, purposes, key parameters
-- **Example**: ["authenticate(token: string): Promise<User> - Validates JWT and returns user", "refreshToken(user: User): string - Generates new access token"]
+- **Format**: Comprehensive array of searchable terms, technologies, patterns, concepts (use FULL words)
+- **Focus**: All terms that would help AI agents find and understand this file
+- **Storage**: Full terms preserved in metadata - system automatically abbreviates for index display
+- **Ordering**: **CRITICAL** - Order by importance (most essential terms first, index shows first 8 terms)
+- **Priority Strategy**: Core function → Primary technology → Key patterns → Supporting technologies → Business domain
+- **Include**: Technologies, frameworks, domain concepts, important functions, patterns, business terms
+- **Example**: ["authentication", "jwt", "middleware", "security", "token-validation", "session-management", "express", "nodejs", "redis", "oauth"] (auth + jwt most critical)
+- **Note**: Write full words like "authentication", "configuration", "database" - abbreviation (auth, config, db) happens automatically in the compact index
 
 ## Optional Fields (High Value)
 
@@ -73,11 +77,14 @@
 ## Analysis Guidelines
 
 1. **Comprehensive coverage**: Include all important aspects of the file
-2. **AI-centric perspective**: Focus on information that helps AI understand and work with the code
+2. **AI-centric perspective**: Focus on information that helps AI understand and work with the code  
 3. **Practical details**: Include specifics that would be needed for modification or debugging
 4. **Architecture awareness**: Explain how this fits into the larger system
 5. **Error scenarios**: Cover what can go wrong and how it's handled
 6. **Integration focus**: Explain how this connects to other parts of the system
+7. **Search optimization**: keyTerms will be compressed in the compact index - include both full and abbreviated forms
+8. **Priority awareness**: High complexity files appear first in the AI index - make analysis comprehensive
+9. **Term prioritization**: Order keyTerms strategically - most critical for finding this file come first
 
 ## When to Use
 - **Complex source files**: Core business logic, main application files
@@ -90,11 +97,10 @@
 ```json
 {
   "purpose": "Core authentication middleware that handles JWT token validation, user session management, and security enforcement for all API endpoints. Integrates with multiple authentication providers and manages token lifecycle including refresh logic.",
-  "keyAPIs": [
-    "authenticateToken(token: string): Promise<AuthResult> - Main authentication function that validates JWT tokens",
-    "refreshUserToken(userId: string): Promise<TokenPair> - Generates new access/refresh token pair",
-    "validateSession(sessionId: string): Promise<Session> - Checks if user session is still valid",
-    "revokeToken(token: string): Promise<void> - Invalidates token and cleans up session"
+  "keyTerms": [
+    "authentication", "jwt", "middleware", "security", "token-validation", 
+    "session-management", "express", "nodejs", "redis", "oauth", "auth0",
+    "refresh-tokens", "blacklisting", "crypto", "authorization"
   ],
   "dependencies": [
     "jsonwebtoken - JWT creation, validation, and parsing",

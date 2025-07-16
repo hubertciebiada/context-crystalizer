@@ -236,62 +236,46 @@ export class ContextStorage {
         }
       }
       
-      // Group by category
-      const byCategory: Record<string, any[]> = {};
-      contexts.forEach(ctx => {
-        if (!byCategory[ctx.category]) byCategory[ctx.category] = [];
-        byCategory[ctx.category].push(ctx);
-      });
-      
       // Generate statistics
       const totalTokens = contexts.reduce((sum, ctx) => sum + (ctx.tokenCount || 0), 0);
-      const categoryStats = Object.entries(byCategory).map(([cat, ctxs]) => `${cat}: ${ctxs.length}`).join(', ');
-      const templateStats = contexts.reduce((acc, ctx) => {
-        acc[ctx.template] = (acc[ctx.template] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      const templateStatsStr = Object.entries(templateStats).map(([template, count]) => `${template}: ${count}`).join(', ');
       
-      // Build index content
+      // Build compact AI-optimized index
       const lines = [
-        '# Crystallized Context Index',
-        '',
-        '## Overview',
-        'This index provides an AI-optimized overview of all crystallized contexts in this repository.',
-        '',
-        '## Statistics',
-        `- Total contexts: ${contexts.length}`,
-        `- By category: ${categoryStats}`,
-        `- By template: ${templateStatsStr}`,
-        `- Total tokens: ${totalTokens}`,
-        '',
-        '## Complexity Legend',
-        '- 🟢 **Low complexity**: Simple files, easy to understand',
-        '- 🟡 **Medium complexity**: Moderate complexity, standard logic',
-        '- 🔴 **High complexity**: Complex files requiring careful analysis',
-        '',
-        '## Contexts by Category',
+        `# 🔍 AI Context Index | ${contexts.length} files | ${Math.round(totalTokens/1000)}K tokens`,
         '',
       ];
-      
-      // Add contexts grouped by category
-      Object.entries(byCategory).forEach(([category, ctxs]) => {
-        lines.push(`### ${category.charAt(0).toUpperCase() + category.slice(1)}`);
-        lines.push('');
+
+      // Sort contexts by priority: complexity (high->low) then by token count (high->low)
+      const sortedContexts = contexts.sort((a, b) => {
+        const complexityOrder: Record<string, number> = { 'high': 3, 'medium': 2, 'low': 1 };
+        const complexityDiff = (complexityOrder[b.complexity] || 1) - (complexityOrder[a.complexity] || 1);
+        if (complexityDiff !== 0) return complexityDiff;
+        return (b.tokenCount || 0) - (a.tokenCount || 0);
+      });
+
+      // Generate compact entries
+      sortedContexts.forEach(ctx => {
+        const complexityBadge = ctx.complexity === 'high' ? '🔴' : ctx.complexity === 'medium' ? '🟡' : '🟢';
+        const tokens = ctx.tokenCount ? `${ctx.tokenCount}t` : '0t';
         
-        ctxs.forEach(ctx => {
-          const contextPath = `./context/${ctx.relativePath}.context.md`;
-          const tokenInfo = ctx.tokenCount ? ` (${ctx.tokenCount} tokens)` : '';
-          const complexityBadge = ctx.complexity === 'high' ? '🔴' : ctx.complexity === 'medium' ? '🟡' : '🟢';
-          lines.push(`- ${complexityBadge} [${ctx.relativePath}](${contextPath})${tokenInfo}`);
-          
-          if (ctx.keyTerms?.length > 0) {
-            ctx.keyTerms.forEach((term: string) => {
-              lines.push(`  - ${term}`);
-            });
-          }
-        });
-        lines.push('');
+        // Keep full file path for AI tools to open files correctly
+        const fullPath = ctx.relativePath;
+        
+        // Compress and abbreviate key terms (preserve searchability while saving tokens)
+        const compressedTerms = (ctx.keyTerms || [])
+          .slice(0, 8) // Limit to 8 most important terms
+          .map((term: string) => term
+            .replace(/authentication/g, 'auth')
+            .replace(/configuration/g, 'config')
+            .replace(/database/g, 'db')
+            .replace(/middleware/g, 'mw')
+            .replace(/management/g, 'mgmt')
+            .replace(/application/g, 'app')
+            .replace(/endpoint/g, 'ep')
+            .replace(/service/g, 'svc'))
+          .join(',');
+        
+        lines.push(`${complexityBadge} [${fullPath}](./context/${fullPath}.context.md) (${tokens}) ${compressedTerms}`);
       });
       
       lines.push('---');

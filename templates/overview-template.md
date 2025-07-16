@@ -5,16 +5,20 @@
 ## Required Fields
 
 ### purpose (required)
-- **Max tokens**: 25
+- **Max tokens**: 20
 - **Format**: Single sentence describing what this file does
 - **Focus**: Primary function, not implementation details
 - **Example**: "Authentication middleware that validates JWT tokens for API requests"
 
 ### keyTerms (required)
-- **Max tokens**: 20
-- **Format**: Array of 3-5 searchable keywords
+- **Max tokens**: 25
+- **Format**: Array of 3-6 searchable keywords (use FULL words, not abbreviations)
 - **Focus**: Technologies, patterns, domain concepts that AI agents would search for
-- **Example**: ["JWT", "authentication", "middleware", "API", "validation"]
+- **Storage**: Full terms are stored in metadata - system automatically abbreviates for index display
+- **Priority**: These terms appear in the compact index - optimize for searchability
+- **Ordering**: **CRITICAL** - Order from most important to least important (first terms show in truncated index)
+- **Example**: ["authentication", "JWT", "middleware", "security", "API", "validation"] (auth most important)
+- **Note**: Write "authentication" not "auth" - abbreviation happens automatically in index
 
 ### category (required)
 - **Max tokens**: 5
@@ -46,7 +50,16 @@
 }
 ```
 
+## Compact Index Integration
+- **Always generate**: Overview analysis feeds into the compact AI index
+- **Index format**: Your analysis appears as `🔴 [full/file/path.ext](./context/full/file/path.ext.context.md) (250t) auth,config,db`  
+- **Term abbreviation**: Full keyTerms you provide get automatically shortened in index only
+- **Abbreviation mapping**: authentication→auth, configuration→config, database→db, middleware→mw, management→mgmt, application→app, endpoint→ep, service→svc
+- **Searchability**: keyTerms become the primary search mechanism for AI agents
+- **File access**: Full paths preserved so AI tools can open files correctly
+- **Prioritization**: Files sorted by complexity (high→medium→low) then token count
+
 ## When to Use
 - **Always**: Generate overview for every file to create searchable index
-- **Goal**: Enable semantic search across entire repository
+- **Goal**: Enable semantic search across entire repository  
 - **Benefit**: AI agents can quickly locate relevant files without reading full contexts
