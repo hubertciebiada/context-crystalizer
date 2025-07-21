@@ -15,58 +15,18 @@ export function createGuidanceCommand() {
         
         console.log(chalk.green('✓ Crystallization guidance loaded!\n'));
         
-        // Display guidance in a readable format
-        console.log(chalk.bold.cyan('WHO AM I:'));
-        console.log(chalk.gray(guidance.whoAmI));
+        // Display system guidance
+        console.log(chalk.bold.cyan('SYSTEM GUIDANCE:'));
+        console.log(chalk.gray(guidance.systemGuidance));
         console.log();
         
-        console.log(chalk.bold.cyan('WHAT AM I DOING:'));
-        console.log(chalk.gray(guidance.whatAmIDoing));
-        console.log();
-        
-        console.log(chalk.bold.cyan('WHY IT MATTERS:'));
-        console.log(chalk.gray(guidance.whyItMatters));
-        console.log();
-        
-        console.log(chalk.bold.cyan('GOAL:'));
-        console.log(chalk.gray(guidance.goal));
-        console.log();
-        
-        console.log(chalk.bold.cyan('TEMPLATES:'));
-        Object.entries(guidance.templates).forEach(([name, template]: [string, any]) => {
+        console.log(chalk.bold.cyan('TEMPLATE GUIDANCE:'));
+        Object.entries(guidance.templateGuidance).forEach(([name, template]: [string, any]) => {
           console.log(chalk.yellow(`  ${name.toUpperCase()}:`));
           console.log(chalk.gray(`    Source: ${template.source}`));
+          console.log(chalk.gray(`    Content Preview: ${template.guidance.substring(0, 100)}...`));
           console.log();
         });
-        
-        console.log(chalk.bold.cyan('TEMPLATE SELECTION:'));
-        Object.entries(guidance.templateSelection).forEach(([name, description]) => {
-          console.log(chalk.yellow(`  ${name}:`), chalk.gray(description));
-        });
-        console.log();
-        
-        console.log(chalk.bold.cyan('ANALYSIS METHODOLOGY:'));
-        Object.entries(guidance.analysisMethodology).forEach(([step, description]) => {
-          console.log(chalk.yellow(`  ${step}:`), chalk.gray(description));
-        });
-        console.log();
-        
-        console.log(chalk.bold.cyan('QUALITY STANDARDS:'));
-        guidance.qualityStandards.forEach((standard: string) => {
-          console.log(chalk.gray(`  • ${standard}`));
-        });
-        console.log();
-        
-        console.log(chalk.bold.cyan('INDEXING NOTE:'));
-        console.log(chalk.gray(guidance.indexingNote));
-        console.log();
-        
-        console.log(chalk.bold.cyan('EXPECTATION:'));
-        console.log(chalk.gray(guidance.expectation));
-        console.log();
-        
-        console.log(chalk.bold.cyan('TEMPLATE CUSTOMIZATION:'));
-        console.log(chalk.gray(guidance.templateCustomization));
         
       } catch (error) {
         console.error(chalk.red('❌ Failed to load crystallization guidance:'));

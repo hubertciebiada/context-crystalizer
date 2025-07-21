@@ -137,6 +137,9 @@ export class CrystallizerCore {
   }
 
   private async performFreshInitialization(repoPath: string, exclude: string[]): Promise<{ filesQueued: number; reinitialized?: boolean }> {
+    // Ensure infrastructure files exist for fresh setup
+    await this.ensureInfrastructure(repoPath);
+    
     // Initialize components for fresh setup
     await this.initializeComponents(repoPath, exclude);
 
@@ -151,95 +154,57 @@ export class CrystallizerCore {
   private async createTemplateFiles(repoPath: string): Promise<void> {
     const templatesDir = path.join(repoPath, '.context-crystallizer', 'templates');
     await fs.mkdir(templatesDir, { recursive: true });
-
-    // Define template files to copy
-    const templateFiles = [
-      'overview-template.md',
-      'standard-template.md', 
-      'detailed-template.md'
-    ];
+    
+    // Create guidance and output directories
+    const guidanceDir = path.join(templatesDir, 'guidance');
+    const outputDir = path.join(templatesDir, 'output');
+    await fs.mkdir(guidanceDir, { recursive: true });
+    await fs.mkdir(outputDir, { recursive: true });
 
     // Copy template files from the package templates directory
     const packageTemplatesDir = path.resolve(__dirname, '../../templates');
+
+    // Copy system guidance file first
+    const systemGuidanceSource = path.join(packageTemplatesDir, 'guidance', 'system-guidance.md');
+    const systemGuidanceDest = path.join(guidanceDir, 'system-guidance.md');
+    await this.copyTemplateFile(systemGuidanceSource, systemGuidanceDest, 'system-guidance.md');
+
+    // Define template files to copy (split into guidance and output files)
+    const templateFiles = [
+      { guidance: 'overview-guidance.md', output: 'overview-output.mustache' },
+      { guidance: 'standard-guidance.md', output: 'standard-output.mustache' },
+      { guidance: 'detailed-guidance.md', output: 'detailed-output.mustache' }
+    ];
     
-    for (const templateFile of templateFiles) {
-      const sourcePath = path.join(packageTemplatesDir, templateFile);
-      const destPath = path.join(templatesDir, templateFile);
+    for (const { guidance, output } of templateFiles) {
+      // Copy guidance file
+      const guidanceSourcePath = path.join(packageTemplatesDir, 'guidance', guidance);
+      const guidanceDestPath = path.join(guidanceDir, guidance);
+      await this.copyTemplateFile(guidanceSourcePath, guidanceDestPath, guidance);
       
-      // Only create if it doesn't exist (don't overwrite user customizations)
+      // Copy output template file
+      const outputSourcePath = path.join(packageTemplatesDir, 'output', output);
+      const outputDestPath = path.join(outputDir, output);
+      await this.copyTemplateFile(outputSourcePath, outputDestPath, output);
+    }
+  }
+
+  private async copyTemplateFile(sourcePath: string, destPath: string, fileName: string): Promise<void> {
+    // Only create if it doesn't exist (don't overwrite user customizations)
+    try {
+      await fs.access(destPath);
+      // File exists, skip
+    } catch {
+      // File doesn't exist, copy it
       try {
-        await fs.access(destPath);
-        // File exists, skip
-      } catch {
-        // File doesn't exist, copy it
-        try {
-          const templateContent = await fs.readFile(sourcePath, 'utf-8');
-          await fs.writeFile(destPath, templateContent);
-        } catch (error) {
-          // If we can't read from package templates, create basic versions
-          await this.createDefaultTemplate(destPath, templateFile);
-        }
+        const templateContent = await fs.readFile(sourcePath, 'utf-8');
+        await fs.writeFile(destPath, templateContent);
+      } catch (error) {
+        throw new Error(`Failed to copy required template file '${fileName}' from ${sourcePath} to ${destPath}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   }
 
-  private async createDefaultTemplate(destPath: string, templateFile: string): Promise<void> {
-    let content = '';
-    
-    switch (templateFile) {
-      case 'overview-template.md':
-        content = `# Overview Template (≤50 tokens)
-
-Extract ultra-compact information for indexing and search.
-
-## Required Fields
-- purpose: Single sentence describing what this file does
-- keyTerms: Array of 3-5 searchable keywords
-- category: File type (config, source, test, docs, other)
-
-Focus on essential identification information for search.`;
-        break;
-
-      case 'standard-template.md':
-        content = `# Standard Template (≤200 tokens)
-
-Extract regular analysis information for most files.
-
-## Required Fields
-- purpose: 2-3 sentences describing file's role and functionality
-- keyTerms: Array of key searchable terms, concepts, entities
-
-## Optional Fields
-- dependencies: Important imports and dependencies
-- patterns: Implementation patterns and conventions
-- relatedContexts: Related files that work together
-
-Focus on information useful for AI understanding.`;
-        break;
-
-      case 'detailed-template.md':
-        content = `# Detailed Template (≤2000 tokens)
-
-Extract comprehensive analysis for complex, high-value files.
-
-## Required Fields
-- purpose: Detailed explanation of file's role and architecture
-- keyTerms: Detailed searchable terms, concepts, entities with semantic meaning
-
-## Optional Fields
-- dependencies: Comprehensive list of imports with purposes
-- patterns: Architectural patterns and design decisions
-- aiGuidance: Specific guidance for AI agents
-- errorHandling: Error scenarios and handling strategies
-- integrationPoints: Connections to external systems
-- relatedContexts: Closely related files
-
-Focus on comprehensive understanding for complex files.`;
-        break;
-    }
-    
-    await fs.writeFile(destPath, content);
-  }
 
   private async createTimeoutConfigFile(repoPath: string): Promise<void> {
     const timeoutConfigPath = path.join(repoPath, '.context-crystallizer', 'crystallization_timeout.txt');
@@ -476,93 +441,51 @@ Focus on comprehensive understanding for complex files.`;
 
     const templatesDir = path.join(targetRepoPath, '.context-crystallizer', 'templates');
     
-    // Load templates from files
-    const templates = await this.loadTemplatesFromFiles(templatesDir);
+    // Load system guidance
+    const systemGuidance = await this.loadSystemGuidance(templatesDir);
+    
+    // Load template-specific guidance
+    const templateGuidance = await this.loadGuidanceFromFiles(templatesDir);
 
     return {
-      whoAmI: "You are a world-class text and code analyzer with exceptional pattern recognition abilities. Your expertise lies in extracting meaningful insights from any type of file or document. You excel at identifying core functionality, relationships, and creating AI-consumable knowledge representations.",
-      
-      whatAmIDoing: "You are transforming repository files into crystallized, indexed knowledge that enables efficient AI-powered analysis and search. Each file you analyze becomes part of a searchable knowledge base.",
-      
-      whyItMatters: "This creates a searchable knowledge base where AI agents can quickly locate relevant information without reading entire files. Your analysis enables semantic search and efficient repository understanding.",
-      
-      goal: "Create token-efficient, indexed contexts that preserve essential information while enabling fast semantic search. Optimize for AI comprehension and searchability.",
-      
-      templates,
-      
-      templateSelection: {
-        overview: "Generate for every file to create searchable index entries. Ultra-compact for maximum coverage.",
-        standard: "Use for config files, utilities, simple components, and medium complexity files. Balance detail with efficiency.",
-        detailed: "Use for complex source files, core business logic, components, and high-value files. Maximum detail within token limits."
-      },
-      
-      analysisMethodology: {
-        step1: "Read and understand the file's primary purpose and role in the system",
-        step2: "Extract keyTerms: searchable keywords using FULL words (not abbreviations) - order by importance (most critical first) - system will auto-abbreviate for index display",
-        step3: "Map important dependencies and relationships to other files",
-        step4: "Recognize implementation patterns, architectural decisions, and conventions",
-        step5: "Extract AI-specific guidance for working with or modifying this code",
-        step6: "Include error handling strategies and integration points where relevant",
-        continuity: "Continue processing ALL files in the repository - stopping mid-process breaks the knowledge base"
-      },
-      
-      qualityStandards: [
-        "Focus on functionality over implementation details",
-        "Prioritize information useful for AI agents and search",
-        "Order keyTerms by importance - most critical search terms first",
-        "Use consistent terminology across all analyses",
-        "Include cross-references to related files when relevant",
-        "Maintain token efficiency while preserving essential clarity",
-        "Extract searchable keywords and functional descriptions"
-      ],
-      
-      compactIndexFormat: {
-        purpose: "Your analysis feeds into a compact AI index for fast searching",
-        format: "🔴 [full/file/path.ext](./context/path.context.md) (tokens) auth,config,db",
-        twoStageProcess: "Stage 1: You provide full keyTerms ordered by importance (authentication, configuration, database). Stage 2: System automatically abbreviates them in index display only (auth, config, db)",
-        fileAccess: "Full file paths preserved so AI tools can open files correctly",
-        sorting: "Files sorted by complexity (high→medium→low) then token count", 
-        compression: "keyTerms automatically abbreviated in index: authentication→auth, database→db, configuration→config, middleware→mw, management→mgmt, application→app, endpoint→ep, service→svc",
-        termPrioritization: "Order keyTerms by importance - most critical first (index may truncate to first 8 terms)",
-        searchability: "Use full words in keyTerms - abbreviation happens automatically for compact display"
-      },
-
-      indexingNote: "All crystallized knowledge is automatically indexed in a compact AI-optimized format. Your full keyTerms get automatically abbreviated in the index as: '🔴 [full/file/path.ext](link) (tokens) auth,config,db'. IMPORTANT: Always use full words in keyTerms (authentication, configuration, database) ordered by importance (most critical first) - the system handles abbreviation automatically for index display. File paths are preserved for AI tool access.",
-      
-      expectation: "Analyze files systematically and thoroughly. Each analysis contributes to the repository's searchable knowledge base. Maintain consistency and quality across all analyses. Generate overview analysis for every file to ensure complete search coverage. CRITICAL: Complete the full crystallization process - do not stop until all files are processed. Partial crystallization significantly reduces search effectiveness and knowledge base quality.",
-      
-      templateCustomization: `Templates are stored in ${templatesDir} and can be customized by users. These files define the structure and guidance for each analysis type.`
+      systemGuidance,
+      templateGuidance
     };
   }
 
-  private async loadTemplatesFromFiles(templatesDir: string): Promise<any> {
-    const templates: any = {};
+  private async loadSystemGuidance(templatesDir: string): Promise<string> {
+    const systemGuidancePath = path.join(templatesDir, 'guidance', 'system-guidance.md');
+    try {
+      return await fs.readFile(systemGuidancePath, 'utf-8');
+    } catch (error) {
+      throw new Error(`Failed to load required system guidance from ${systemGuidancePath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  private async loadGuidanceFromFiles(templatesDir: string): Promise<any> {
+    const guidanceContent: any = {};
     
-    const templateFiles = [
-      { name: 'overview', file: 'overview-template.md' },
-      { name: 'standard', file: 'standard-template.md' },
-      { name: 'detailed', file: 'detailed-template.md' }
+    const guidanceFiles = [
+      { name: 'overview', file: 'overview-guidance.md' },
+      { name: 'standard', file: 'standard-guidance.md' },
+      { name: 'detailed', file: 'detailed-guidance.md' }
     ];
 
-    for (const { name, file } of templateFiles) {
+    for (const { name, file } of guidanceFiles) {
+      const guidancePath = path.join(templatesDir, 'guidance', file);
       try {
-        const templatePath = path.join(templatesDir, file);
-        const content = await fs.readFile(templatePath, 'utf-8');
-        templates[name] = {
+        const content = await fs.readFile(guidancePath, 'utf-8');
+        guidanceContent[name] = {
           name,
           guidance: content,
-          source: templatePath
+          source: guidancePath
         };
       } catch (error) {
-        // Fallback to basic template definition if file can't be read
-        templates[name] = {
-          name,
-          guidance: `Basic ${name} template - customize by editing template files`,
-          source: 'built-in fallback'
-        };
+        throw new Error(`Failed to load required guidance file '${name}' from ${guidancePath}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
-
-    return templates;
+    
+    return guidanceContent;
   }
+
 }

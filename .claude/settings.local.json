@@ -47,7 +47,14 @@
       "Bash(gh release:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
-      "Bash(npm version:*)"
+      "Bash(npm version:*)",
+      "mcp__github__search_repositories",
+      "mcp__github__get_me",
+      "mcp__github__fork_repository",
+      "Bash(git clone:*)",
+      "Bash(git checkout:*)",
+      "Bash(../dist/index.js init .)",
+      "Bash(./dist/index.js init:*)"
     ],
     "deny": [
       "Bash(npm publish:*)"

@@ -36,6 +36,14 @@ export interface TemplateSection {
   format: 'text' | 'list' | 'code' | 'markdown';
 }
 
+export interface ParsedTemplate {
+  name: string;
+  guidance: string;
+  outputTemplate: string;
+  maxTokens: number;
+  source?: string;
+}
+
 export interface FileQueueItem {
   path: string;
   relativePath: string;

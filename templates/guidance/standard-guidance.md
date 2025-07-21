@@ -64,7 +64,7 @@
 - **Medium complexity**: Standard business logic, helpers
 - **Default choice**: When in doubt, use standard template
 
-## Example Output Structure
+## Expected JSON Output Structure
 ```json
 {
   "purpose": "React component for user authentication forms. Handles login, signup, and password reset flows with validation.",
@@ -75,48 +75,3 @@
   "complexity": "medium"
 }
 ```
-
----OUTPUT-TEMPLATE---
-# Crystallized Context: {{relativePath}}
-
-<!-- Crystallized Context Metadata -->
-<!-- Template: {{template}} -->
-<!-- Category: {{category}} -->
-<!-- Complexity: {{complexity}} -->
-<!-- Tokens: {{TOKEN_COUNT}} -->
-<!-- Generated: {{lastModified}} -->
-
-## Purpose
-{{purpose}}
-
-{{#keyTerms.length}}
-## Key Terms
-{{#keyTerms}}
-- {{.}}
-{{/keyTerms}}
-{{/keyTerms.length}}
-
-{{#dependencies.length}}
-## Dependencies
-{{#dependencies}}
-- {{.}}
-{{/dependencies}}
-{{/dependencies.length}}
-
-{{#patterns.length}}
-## Patterns
-{{#patterns}}
-- {{.}}
-{{/patterns}}
-{{/patterns.length}}
-
-{{#relatedContexts.length}}
-## Related Contexts
-{{#relatedContexts}}
-- {{.}}
-{{/relatedContexts}}
-{{/relatedContexts.length}}
-
----
-*Last updated: {{lastModified}}*
-*Token count: {{TOKEN_COUNT}}*

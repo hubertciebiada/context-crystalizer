@@ -40,7 +40,7 @@
 3. **Focus on "what"**: Not "how" - describe function, not implementation
 4. **Think search**: What would someone type to find this file?
 
-## Example Output Structure
+## Expected JSON Output Structure
 ```json
 {
   "purpose": "Authentication middleware that validates JWT tokens for API requests",
@@ -63,27 +63,3 @@
 - **Always**: Generate overview for every file to create searchable index
 - **Goal**: Enable semantic search across entire repository  
 - **Benefit**: AI agents can quickly locate relevant files without reading full contexts
-
----OUTPUT-TEMPLATE---
-# Crystallized Context: {{relativePath}}
-
-<!-- Crystallized Context Metadata -->
-<!-- Template: {{template}} -->
-<!-- Category: {{category}} -->
-<!-- Complexity: {{complexity}} -->
-<!-- Tokens: {{TOKEN_COUNT}} -->
-<!-- Generated: {{lastModified}} -->
-
-## Purpose
-{{purpose}}
-
-{{#keyTerms.length}}
-## Key Terms
-{{#keyTerms}}
-- {{.}}
-{{/keyTerms}}
-{{/keyTerms.length}}
-
----
-*Last updated: {{lastModified}}*
-*Token count: {{TOKEN_COUNT}}*

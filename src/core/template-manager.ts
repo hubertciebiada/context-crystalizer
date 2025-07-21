@@ -1,8 +1,13 @@
-import { ContextTemplate, TemplateSection, CrystallizedContext } from '../types/index.js';
+import { promises as fs } from 'fs';
+import path from 'path';
+import Mustache from 'mustache';
+import { ContextTemplate, CrystallizedContext, ParsedTemplate } from '../types/index.js';
 import { TokenCounter } from '../utils/token-counter.js';
 
 export class TemplateManager {
   private templates: Map<string, ContextTemplate>;
+  private parsedTemplates: Map<string, ParsedTemplate> = new Map();
+  private static readonly TOKEN_PLACEHOLDER = '{{TOKEN_COUNT}}';
 
   constructor() {
     this.templates = new Map();
@@ -57,74 +62,104 @@ export class TemplateManager {
   }
 
   generateContextMarkdown(context: CrystallizedContext): string {
-    const template = this.getTemplate(context.template) || this.getTemplate('standard')!;
-    const lines: string[] = [];
-
-    // Header
-    lines.push(`# Crystallized Context: ${context.relativePath}`);
-    lines.push('');
-
-    // Metadata
-    lines.push('<!-- Crystallized Context Metadata -->');
-    lines.push(`<!-- Template: ${context.template} -->`);
-    lines.push(`<!-- Category: ${context.category} -->`);
-    lines.push(`<!-- Complexity: ${context.complexity} -->`);
-    lines.push(`<!-- Tokens: ${context.tokenCount || 0} -->`);
-    lines.push(`<!-- Generated: ${context.lastModified.toISOString()} -->`);
-    lines.push('');
-
-    // Generate sections based on template
-    for (const section of template.sections) {
-      const content = this.generateSection(section, context);
-      if (content) {
-        lines.push(content);
-        lines.push('');
-      }
+    const parsedTemplate = this.parsedTemplates.get(context.template);
+    
+    if (!parsedTemplate) {
+      throw new Error(`Template '${context.template}' not found. Ensure templates are loaded from .context-crystallizer/templates/ directory.`);
     }
+    
+    return this.generateFromMustacheTemplate(context, parsedTemplate);
+  }
 
-    // Footer with references
-    if (context.crossReferences && context.crossReferences.length > 0) {
-      lines.push('## Cross References');
-      context.crossReferences.forEach(ref => {
-        // Ensure ref is an object and has required properties
-        if (ref && typeof ref === 'object' && ref.type && ref.target) {
-          const desc = ref.description ? ` - ${ref.description}` : '';
-          lines.push(`- **${ref.type}**: \`${ref.target}\`${desc}`);
-        }
-      });
-      lines.push('');
-    }
+  private generateFromMustacheTemplate(context: CrystallizedContext, template: ParsedTemplate): string {
+    // Prepare data for Mustache with computed properties
+    const templateData = {
+      ...context,
+      lastModified: context.lastModified.toISOString(),
+      TOKEN_COUNT: TemplateManager.TOKEN_PLACEHOLDER,
+      // Add .length properties for conditional rendering
+      keyTerms: context.keyTerms || [],
+      dependencies: context.dependencies || [],
+      patterns: context.patterns || [],
+      relatedContexts: context.relatedContexts || [],
+      errorHandling: context.errorHandling || [],
+      integrationPoints: context.integrationPoints || [],
+      crossReferences: context.crossReferences || []
+    };
 
-    lines.push('---');
-    lines.push(`*Last updated: ${context.lastModified.toISOString()}*`);
-    lines.push(`*Token count: ${context.tokenCount || 0}*`);
+    // Add computed length properties for conditionals
+    (templateData as any)['keyTerms.length'] = templateData.keyTerms.length;
+    (templateData as any)['dependencies.length'] = templateData.dependencies.length;
+    (templateData as any)['patterns.length'] = templateData.patterns.length;
+    (templateData as any)['relatedContexts.length'] = templateData.relatedContexts.length;
+    (templateData as any)['errorHandling.length'] = templateData.errorHandling.length;
+    (templateData as any)['integrationPoints.length'] = templateData.integrationPoints.length;
+    (templateData as any)['crossReferences.length'] = templateData.crossReferences.length;
 
-    const markdown = lines.join('\n');
+    // Render with Mustache
+    const rendered = Mustache.render(template.outputTemplate, templateData);
     
     // Optimize for token count
-    return TokenCounter.optimizeContent(markdown, template.maxTokens);
+    return TokenCounter.optimizeContent(rendered, template.maxTokens);
   }
 
-  private generateSection(section: TemplateSection, context: CrystallizedContext): string | null {
-    const sectionData = this.getSectionData(section.name, context);
-    
-    if (!sectionData && !section.required) {
-      return null;
-    }
 
-    const title = this.getSectionTitle(section.name);
-    const content = this.formatSectionContent(sectionData, section);
-    
-    if (!content && section.required) {
-      return `## ${title}\n*No ${section.name} information available*`;
-    }
-    
-    if (!content) {
-      return null;
-    }
-
-    return `## ${title}\n${content}`;
+  replaceTokenPlaceholder(markdown: string, tokenCount: number): string {
+    // Replace all instances of the token placeholder with the actual count
+    // If placeholder not found, return markdown unchanged (graceful fallback)
+    return markdown.replace(new RegExp(TemplateManager.TOKEN_PLACEHOLDER, 'g'), tokenCount.toString());
   }
+
+  async loadTemplatesFromFiles(templatesDir: string): Promise<void> {
+    const templateFiles = [
+      { name: 'overview', guidanceFile: 'overview-guidance.md', outputFile: 'overview-output.mustache' },
+      { name: 'standard', guidanceFile: 'standard-guidance.md', outputFile: 'standard-output.mustache' },
+      { name: 'detailed', guidanceFile: 'detailed-guidance.md', outputFile: 'detailed-output.mustache' }
+    ];
+
+    for (const { name, guidanceFile, outputFile } of templateFiles) {
+      const guidancePath = path.join(templatesDir, 'guidance', guidanceFile);
+      const outputPath = path.join(templatesDir, 'output', outputFile);
+      
+      try {
+        const guidanceContent = await fs.readFile(guidancePath, 'utf-8');
+        const outputTemplate = await fs.readFile(outputPath, 'utf-8');
+        
+        const parsed = this.parseTemplate(guidanceContent, outputTemplate, name);
+        this.parsedTemplates.set(name, parsed);
+      } catch (error) {
+        throw new Error(`Failed to load required template '${name}' from ${guidancePath} or ${outputPath}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+  }
+
+  private parseTemplate(guidanceContent: string, outputTemplate: string, name: string): ParsedTemplate {
+    if (!guidanceContent.trim()) {
+      throw new Error(`Template '${name}' has empty guidance content. Please provide analysis guidance.`);
+    }
+
+    if (!outputTemplate.trim()) {
+      throw new Error(`Template '${name}' has empty output template. Please provide a Mustache template.`);
+    }
+
+    return {
+      name,
+      guidance: guidanceContent.trim(),
+      outputTemplate: outputTemplate.trim(),
+      maxTokens: this.getDefaultMaxTokens(name)
+    };
+  }
+
+  private getDefaultMaxTokens(templateName: string): number {
+    switch (templateName) {
+      case 'overview': return 50;
+      case 'standard': return 200;
+      case 'detailed': return 2000;
+      default: return 200;
+    }
+  }
+
+
 
   private getSectionData(sectionName: string, context: CrystallizedContext): any {
     switch (sectionName) {
@@ -143,57 +178,7 @@ export class TemplateManager {
     }
   }
 
-  private getSectionTitle(sectionName: string): string {
-    const titles: Record<string, string> = {
-      purpose: 'Purpose',
-      keyTerms: 'Key Terms',
-      dependencies: 'Dependencies',
-      patterns: 'Patterns',
-      aiGuidance: 'AI Guidance',
-      errorHandling: 'Error Handling',
-      integrationPoints: 'Integration Points',
-      crossReferences: 'Cross References',
-      relatedContexts: 'Related Contexts',
-      category: 'Category',
-      complexity: 'Complexity',
-    };
-    return titles[sectionName] || sectionName;
-  }
 
-  private formatSectionContent(data: any, section: TemplateSection): string | null {
-    if (!data) return null;
-
-    let content = '';
-
-    switch (section.format) {
-      case 'text':
-        content = String(data);
-        break;
-      
-      case 'list':
-        if (Array.isArray(data) && data.length > 0) {
-          content = data.map(item => `- ${item}`).join('\n');
-        } else {
-          return null;
-        }
-        break;
-      
-      case 'markdown':
-        content = String(data);
-        break;
-      
-      case 'code':
-        content = `\`\`\`\n${String(data)}\n\`\`\``;
-        break;
-    }
-
-    // Apply token limits if specified
-    if (section.maxTokens) {
-      content = TokenCounter.truncateToTokenLimit(content, section.maxTokens, section.format === 'code');
-    }
-
-    return content;
-  }
 
   determineTemplateForFile(
     complexity: 'low' | 'medium' | 'high', 

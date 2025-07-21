@@ -1,6 +1,6 @@
 {
   "name": "context-crystallizer",
-  "version": "1.1.14",
+  "version": "1.2.0",
   "description": "AI Crystallization Engineering for Large Repositories - Transform massive repositories into crystallized, AI-consumable knowledge through systematic analysis and optimization. Crystallization extracts meaningful context from any readable files.",
   "type": "module",
   "main": "dist/index.js",
@@ -55,6 +55,7 @@
     "glob": "^11.0.0",
     "ignore": "^6.0.2",
     "minimatch": "^10.0.1",
+    "mustache": "^4.2.0",
     "p-limit": "^6.2.0",
     "p-queue": "^8.0.1",
     "picomatch": "^4.0.2"
@@ -62,6 +63,7 @@
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/glob": "^8.1.0",
+    "@types/mustache": "^4.2.6",
     "@types/node": "^22.10.2",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.19.0",

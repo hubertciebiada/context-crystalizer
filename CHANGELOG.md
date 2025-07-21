@@ -5,6 +5,34 @@ All notable changes to Context Crystallizer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-01-21
+
+### Changed
+- **BREAKING**: Template system completely restructured into separate guidance and output files
+- **BREAKING**: `getCrystallizationGuidance()` now returns `{ systemGuidance, templateGuidance }` structure
+- Template files now split into `templates/guidance/` and `templates/output/` directories
+- System guidance moved from hardcoded text to customizable `system-guidance.md` file
+- Guidance command updated to display new guidance structure
+- All template-related variable names clarified (`templates` → `guidanceContent` where appropriate)
+
+### Added
+- `system-guidance.md` file containing all crucial system crystallization guidance
+- Separate Mustache output templates for each analysis level (overview, standard, detailed)
+- Enhanced error messages with clear file paths when templates are missing
+- Template file copying during initialization for both fresh and existing repositories
+
+### Fixed
+- Template files now properly created during fresh initialization (was missing `ensureInfrastructure` call)
+- Session recovery bug where already-processed files were being reprocessed after AI tool restart
+- Token count displaying as 0 in generated `.context.md` files (fixed circular dependency)
+- All fallback logic removed - system now fails fast with explicit errors when templates missing
+
+### Technical
+- Clean separation between AI guidance content and internal storage formatting
+- User-customizable guidance files for complete control over AI analysis instructions
+- Maintained backward compatibility for existing crystallized repositories
+- No information loss - all previous hardcoded guidance preserved in files
+
 ## [1.0.0] - 2024-12-07
 
 ### Added

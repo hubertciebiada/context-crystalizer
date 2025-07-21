@@ -93,7 +93,7 @@
 - **Critical components**: Authentication, payment processing, core APIs
 - **Integration hubs**: Files that connect many other parts of the system
 
-## Example Output Structure
+## Expected JSON Output Structure
 ```json
 {
   "purpose": "Core authentication middleware that handles JWT token validation, user session management, and security enforcement for all API endpoints. Integrates with multiple authentication providers and manages token lifecycle including refresh logic.",
@@ -135,74 +135,3 @@
   "complexity": "high"
 }
 ```
-
----OUTPUT-TEMPLATE---
-# Crystallized Context: {{relativePath}}
-
-<!-- Crystallized Context Metadata -->
-<!-- Template: {{template}} -->
-<!-- Category: {{category}} -->
-<!-- Complexity: {{complexity}} -->
-<!-- Tokens: {{TOKEN_COUNT}} -->
-<!-- Generated: {{lastModified}} -->
-
-## Purpose
-{{purpose}}
-
-{{#keyTerms.length}}
-## Key Terms
-{{#keyTerms}}
-- {{.}}
-{{/keyTerms}}
-{{/keyTerms.length}}
-
-{{#dependencies.length}}
-## Dependencies
-{{#dependencies}}
-- {{.}}
-{{/dependencies}}
-{{/dependencies.length}}
-
-{{#patterns.length}}
-## Patterns
-{{#patterns}}
-- {{.}}
-{{/patterns}}
-{{/patterns.length}}
-
-{{#aiGuidance}}
-## AI Guidance
-{{aiGuidance}}
-{{/aiGuidance}}
-
-{{#errorHandling.length}}
-## Error Handling
-{{#errorHandling}}
-- {{.}}
-{{/errorHandling}}
-{{/errorHandling.length}}
-
-{{#integrationPoints.length}}
-## Integration Points
-{{#integrationPoints}}
-- {{.}}
-{{/integrationPoints}}
-{{/integrationPoints.length}}
-
-{{#relatedContexts.length}}
-## Related Contexts
-{{#relatedContexts}}
-- {{.}}
-{{/relatedContexts}}
-{{/relatedContexts.length}}
-
-{{#crossReferences.length}}
-## Cross References
-{{#crossReferences}}
-- **{{type}}**: `{{target}}`{{#description}} - {{description}}{{/description}}
-{{/crossReferences}}
-{{/crossReferences.length}}
-
----
-*Last updated: {{lastModified}}*
-*Token count: {{TOKEN_COUNT}}*

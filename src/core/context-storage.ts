@@ -26,6 +26,10 @@ export class ContextStorage {
     await fs.mkdir(this.contextBasePath, { recursive: true });
     await fs.mkdir(path.join(this.contextBasePath, 'context'), { recursive: true });
     await fs.mkdir(path.join(this.contextBasePath, 'ai-metadata'), { recursive: true });
+    
+    // Load user-customizable templates from files
+    const templatesDir = path.join(this.contextBasePath, 'templates');
+    await this.templateManager.loadTemplatesFromFiles(templatesDir);
   }
 
   async storeContext(
@@ -72,9 +76,14 @@ export class ContextStorage {
       integrationPoints: context.integrationPoints,
     };
     
-    // Generate markdown and calculate token count
-    const markdown = this.templateManager.generateContextMarkdown(fullContext);
-    fullContext.tokenCount = TokenCounter.countMarkdownTokens(markdown);
+    // Generate markdown with token placeholder
+    const markdownWithPlaceholder = this.templateManager.generateContextMarkdown(fullContext);
+    
+    // Calculate actual token count from generated markdown
+    fullContext.tokenCount = TokenCounter.countMarkdownTokens(markdownWithPlaceholder);
+    
+    // Replace placeholder with actual token count
+    const finalMarkdown = this.templateManager.replaceTokenPlaceholder(markdownWithPlaceholder, fullContext.tokenCount);
     
     // Validate context
     const validation = this.templateManager.validateContext(fullContext);
@@ -86,7 +95,7 @@ export class ContextStorage {
     await fs.mkdir(path.dirname(contextPath), { recursive: true });
     
     // Write context as markdown
-    await fs.writeFile(contextPath, markdown, 'utf-8');
+    await fs.writeFile(contextPath, finalMarkdown, 'utf-8');
     
     // Store metadata
     await this.storeMetadata(fullContext);
