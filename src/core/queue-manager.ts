@@ -36,7 +36,15 @@ export class QueueManager {
     const recovered = await this.tryRecoverSession(repoPath, excludePatterns);
     
     if (!recovered) {
-      this.queue = [...files];
+      // Filter out files that already have fresh contexts
+      const filesToProcess: FileQueueItem[] = [];
+      for (const file of files) {
+        if (!(await this.isContextFresh(file))) {
+          filesToProcess.push(file);
+        }
+      }
+      
+      this.queue = filesToProcess;
       this.processed.clear();
       this.startTime = new Date();
       await this.saveQueueState();
@@ -160,10 +168,21 @@ export class QueueManager {
       this.repoPath = state.repoPath;
       this.excludePatterns = state.excludePatterns;
       this.processed = new Set(state.processedFiles);
-      this.queue = state.remainingQueue.map(item => ({
+      
+      // Filter the restored queue to remove files with fresh contexts
+      const restoredQueue = state.remainingQueue.map(item => ({
         ...item,
         lastModified: new Date(item.lastModified),
       }));
+      
+      const filteredQueue: FileQueueItem[] = [];
+      for (const file of restoredQueue) {
+        if (!(await this.isContextFresh(file))) {
+          filteredQueue.push(file);
+        }
+      }
+      
+      this.queue = filteredQueue;
       this.startTime = new Date(state.startTime);
       this.queueStatePath = queueStatePath;
       
@@ -220,6 +239,23 @@ export class QueueManager {
       startTime: this.startTime,
       repoPath: this.repoPath,
     };
+  }
+
+  private async isContextFresh(file: FileQueueItem): Promise<boolean> {
+    if (!this.repoPath) return false;
+    
+    // Build path to the crystallized context file
+    const relativePath = path.isAbsolute(file.path) ? path.relative(this.repoPath, file.path) : file.path;
+    const contextPath = path.join(this.repoPath, '.context-crystallizer', 'context', `${relativePath}.context.md`);
+    
+    try {
+      const contextStats = await fs.stat(contextPath);
+      // Context is fresh if it was created/modified after the source file
+      return contextStats.mtime >= file.lastModified;
+    } catch (_error) {
+      // Context file doesn't exist, so not fresh
+      return false;
+    }
   }
 
   // Claim management methods for concurrent agent support
