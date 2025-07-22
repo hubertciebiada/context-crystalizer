@@ -1,6 +1,6 @@
 {
   "name": "context-crystallizer",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "AI Crystallization Engineering for Large Repositories - Transform massive repositories into crystallized, AI-consumable knowledge through systematic analysis and optimization. Crystallization extracts meaningful context from any readable files.",
   "type": "module",
   "main": "dist/index.js",
@@ -52,6 +52,7 @@
     "@modelcontextprotocol/sdk": "^1.0.4",
     "chalk": "^5.3.0",
     "commander": "^12.1.0",
+    "filenamify": "^6.0.0",
     "glob": "^11.0.0",
     "ignore": "^6.0.2",
     "minimatch": "^10.0.1",

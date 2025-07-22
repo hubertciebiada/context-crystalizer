@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import pLimit from 'p-limit';
+import filenamify from 'filenamify';
 import { CrystallizedContext } from '../types/index.js';
 import { TemplateManager } from './template-manager.js';
 import { CrossReferenceAnalyzer } from './cross-reference-analyzer.js';
@@ -116,7 +117,8 @@ export class ContextStorage {
   }
 
   private async storeMetadata(context: CrystallizedContext): Promise<void> {
-    const metadataPath = path.join(this.contextBasePath, 'ai-metadata', `${context.relativePath.replace(/\//g, '_')}.json`);
+    const safeFilename = filenamify(context.relativePath, { replacement: '_' });
+    const metadataPath = path.join(this.contextBasePath, 'ai-metadata', `${safeFilename}.json`);
     
     const metadata = {
       relativePath: context.relativePath,
